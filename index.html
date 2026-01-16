@@ -521,6 +521,7 @@
         <div class="chip" data-jump="#story">EchoStory</div>
         <div class="chip" data-jump="#lyrics">Lyrics</div>
         <div class="chip" data-jump="#credits">Credits</div>
+        <a href="game.html" class="chip" style="text-decoration: none; display: inline-block;">🎮 Game</a>
       </div>
     </div>
   </div>
@@ -1662,7 +1663,7 @@ State of the bar, he the bouncer’s choice</pre>
         </button>
       </div>
     </div>
-    <audio id="audioElement" preload="metadata"></audio>
+    <audio id="audioElement" preload="auto"></audio>
   </div>
 
   <script type="application/json" id="albumData">{
@@ -1905,14 +1906,36 @@ State of the bar, he the bouncer’s choice</pre>
         // Clear previous error state
         playerTitle.classList.remove('player-error');
         
+        // Stop current playback immediately and reset
+        audio.pause();
+        audio.currentTime = 0;
+        updatePlayState(false);
+        
+        // Set source and load
         audio.src = filename;
-        audio.load().catch(err => {
+        
+        // Try to load and play as soon as possible
+        const loadPromise = audio.load();
+        
+        // Set up play handler for when audio is ready
+        const playWhenReady = () => {
+          if (audio.readyState >= 2) {
+            audio.removeEventListener('canplay', playWhenReady);
+            audio.removeEventListener('loadeddata', playWhenReady);
+            // Don't auto-play here - let playTrack handle it
+          }
+        };
+        audio.addEventListener('canplay', playWhenReady, { once: true });
+        audio.addEventListener('loadeddata', playWhenReady, { once: true });
+        
+        loadPromise.catch(err => {
           console.error('Audio load failed:', err);
           audioError = err;
           isLoading = false;
           player.classList.remove('player-loading');
           playerTitle.classList.add('player-error');
           playerTitle.textContent = trackData.title + ' (Error loading)';
+          updatePlayState(false);
         });
       }
 
@@ -2049,8 +2072,9 @@ State of the bar, he the bouncer’s choice</pre>
     }
 
     function playTrack(trackNum) {
-      // Always update player to ensure it's visible
-      if (currentTrack !== trackNum) {
+      // Always update player FIRST to ensure it's visible immediately
+      const wasDifferentTrack = currentTrack !== trackNum;
+      if (wasDifferentTrack) {
         updatePlayer(trackNum);
       } else {
         // Even if same track, ensure player is visible
@@ -2059,33 +2083,91 @@ State of the bar, he the bouncer’s choice</pre>
           player.style.display = '';
         }
       }
-      audio.play().then(() => {
-        updatePlayState(true);
-        audioError = null;
-        playerTitle.classList.remove('player-error');
-      }).catch(err => {
-        // Silent error handling - user-friendly
-        updatePlayState(false);
-        if (err.name !== 'NotAllowedError') {
-          // Only show error if it's not a user-initiated block
-          const trackData = data.tracks[trackNum - 1];
-          if (trackData) {
-            playerTitle.classList.add('player-error');
-          }
+      
+      // Function to attempt playback
+      const attemptPlay = () => {
+        if (!audio.src) {
+          return false; // No source yet
         }
-      });
+        
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            updatePlayState(true);
+            audioError = null;
+            playerTitle.classList.remove('player-error');
+          }).catch(err => {
+            if (err.name !== 'NotAllowedError') {
+              // Try once more after brief delay
+              setTimeout(() => {
+                if (audio.src && !audio.paused) {
+                  audio.play().then(() => {
+                    updatePlayState(true);
+                    audioError = null;
+                    playerTitle.classList.remove('player-error');
+                  }).catch(() => {
+                    updatePlayState(false);
+                  });
+                }
+              }, 100);
+            } else {
+              updatePlayState(false);
+            }
+          });
+          return true;
+        }
+        return false;
+      };
+      
+      // If different track, wait for audio to load; otherwise try immediately
+      if (wasDifferentTrack) {
+        // Wait for audio source to be set and ready
+        const playWhenReady = () => {
+          if (audio.src && audio.readyState >= 2) {
+            attemptPlay();
+          } else if (audio.src) {
+            // Source is set but not ready - wait for canplay
+            audio.addEventListener('canplay', () => {
+              attemptPlay();
+            }, { once: true });
+          } else {
+            // Source not set yet - check again
+            setTimeout(playWhenReady, 20);
+          }
+        };
+        setTimeout(playWhenReady, 20);
+      } else {
+        // Same track - try to play immediately
+        if (!attemptPlay()) {
+          // If it failed, wait a moment and try again
+          setTimeout(attemptPlay, 50);
+        }
+      }
+    }
+
+
+    function playNext() {
+      if (!currentTrack) return;
+      const next = currentTrack < data.tracks.length ? currentTrack + 1 : 1;
+      // Preload next track while current is playing
+      preloadTrack(next, 0);
+      playTrack(next);
     }
 
     function playPrevious() {
       if (!currentTrack) return;
       const prev = currentTrack > 1 ? currentTrack - 1 : data.tracks.length;
+      // Preload previous track while current is playing
+      preloadTrack(prev, 0);
       playTrack(prev);
     }
 
-    function playNext() {
-      if (!currentTrack) return;
-      const next = currentTrack < data.tracks.length ? currentTrack + 1 : 1;
-      playTrack(next);
+    // Sync UI state with actual audio state
+    function syncPlayState() {
+      const actuallyPlaying = !audio.paused && !audio.ended && audio.readyState > 2;
+      if (actuallyPlaying !== isPlaying) {
+        updatePlayState(actuallyPlaying);
+      }
     }
 
     // Event listeners
@@ -2095,10 +2177,12 @@ State of the bar, he the bouncer’s choice</pre>
         playTrack(1);
         return;
       }
-      if (isPlaying) {
-        audio.pause();
-        updatePlayState(false);
-      } else {
+      
+      // Check actual audio state, not just our variable
+      syncPlayState();
+      
+      if (audio.paused || audio.ended) {
+        // Audio is paused/ended, so play it
         audio.play().then(() => {
           updatePlayState(true);
           audioError = null;
@@ -2106,6 +2190,10 @@ State of the bar, he the bouncer’s choice</pre>
           // Silent error handling
           updatePlayState(false);
         });
+      } else {
+        // Audio is playing, so pause it
+        audio.pause();
+        updatePlayState(false);
       }
     });
 
@@ -2114,8 +2202,17 @@ State of the bar, he the bouncer’s choice</pre>
     versionBtn.addEventListener('click', cycleVersion);
 
     // Audio events
-    audio.addEventListener('ended', () => {
-      playNext();
+    // Preload adjacent tracks when a track starts playing
+    audio.addEventListener('play', () => {
+      updatePlayState(true);
+      if (currentTrack) {
+        // Preload next track
+        const next = currentTrack < data.tracks.length ? currentTrack + 1 : 1;
+        preloadTrack(next, 0);
+        // Preload previous track
+        const prev = currentTrack > 1 ? currentTrack - 1 : data.tracks.length;
+        preloadTrack(prev, 0);
+      }
     });
 
     audio.addEventListener('timeupdate', () => {
@@ -2158,15 +2255,82 @@ State of the bar, he the bouncer’s choice</pre>
       updatePlayState(false);
     });
 
-    audio.addEventListener('canplay', () => {
+    // Sync state from audio events
+    audio.addEventListener('play', () => {
+      updatePlayState(true);
       isLoading = false;
       player.classList.remove('player-loading');
     });
+
+    audio.addEventListener('pause', () => {
+      updatePlayState(false);
+    });
+
+    audio.addEventListener('ended', () => {
+      updatePlayState(false);
+      playNext();
+    });
+
+    audio.addEventListener('canplay', () => {
+      isLoading = false;
+      player.classList.remove('player-loading');
+      // Sync state
+      syncPlayState();
+      // If we're supposed to be playing, ensure we are
+      if (isPlaying && audio.paused) {
+        audio.play().catch(() => {
+          // Silent fail
+        });
+      }
+    });
+
+    audio.addEventListener('canplaythrough', () => {
+      // Audio is ready to play through without stopping
+      isLoading = false;
+      player.classList.remove('player-loading');
+      syncPlayState();
+    });
+
+    audio.addEventListener('waiting', () => {
+      isLoading = true;
+      player.classList.add('player-loading');
+    });
+
+    audio.addEventListener('playing', () => {
+      isLoading = false;
+      player.classList.remove('player-loading');
+      updatePlayState(true);
+    });
+
+    // Preload audio on track hover for faster playback
+    function preloadTrack(trackNum, versionIndex = 0) {
+      const versions = trackFiles[trackNum] || [];
+      if (versions.length > 0) {
+        const filename = versions[versionIndex];
+        if (filename) {
+          const link = document.createElement('link');
+          link.rel = 'prefetch';
+          link.href = filename;
+          link.as = 'audio';
+          document.head.appendChild(link);
+        }
+      }
+    }
 
     // Make track cards playable with version cycling
     $$('.track').forEach(card => {
       let clickTimer = null;
       let longPressTimer = null;
+      let lastClickTime = 0;
+      let lastClickTime = 0;
+      
+      // Preload on hover for instant playback
+      card.addEventListener('mouseenter', () => {
+        const trackNum = parseInt(card.getAttribute('data-track'), 10);
+        if (trackNum) {
+          preloadTrack(trackNum, 0);
+        }
+      });
       
       card.addEventListener('click', (e) => {
         const trackNum = parseInt(card.getAttribute('data-track'), 10);
@@ -2178,16 +2342,27 @@ State of the bar, he the bouncer’s choice</pre>
           longPressTimer = null;
         }
         
-        // Single click: play track
-        if (clickTimer) {
+        const now = Date.now();
+        const timeSinceLastClick = now - lastClickTime;
+        lastClickTime = now;
+        
+        // Double click detection (within 300ms)
+        if (timeSinceLastClick < 300 && clickTimer) {
           clearTimeout(clickTimer);
           clickTimer = null;
-          // Double click: cycle version
-          cycleVersion();
+          // Double click: cycle version (only if same track is playing)
+          if (currentTrack === trackNum) {
+            cycleVersion();
+          } else {
+            // Different track - just play it
+            playTrack(trackNum);
+          }
         } else {
+          // Single click: play track immediately
+          playTrack(trackNum);
+          // Set timer to clear (for double-click detection)
           clickTimer = setTimeout(() => {
             clickTimer = null;
-            playTrack(trackNum);
           }, 300);
         }
       });
@@ -2255,8 +2430,18 @@ State of the bar, he the bouncer’s choice</pre>
     document.addEventListener('visibilitychange', () => {
       if (document.hidden && isPlaying) {
         // Keep playing in background (Media Session handles this)
+      } else if (!document.hidden) {
+        // When coming back, sync state
+        syncPlayState();
       }
     });
+
+    // Periodic state sync to ensure UI matches audio state
+    setInterval(() => {
+      if (currentTrack) {
+        syncPlayState();
+      }
+    }, 500);
 
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {

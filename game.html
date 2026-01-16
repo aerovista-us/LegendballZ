@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#07060b" />
+  <title>Bar Skills Challenge — THE LEGEND OF ZAY</title>
+  <style>
+    :root {
+      --bg: #07060b;
+      --panel: rgba(255,255,255,0.06);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.66);
+      --line: rgba(255,255,255,0.12);
+      --hot: #ffb703;
+      --hot2: #ff006e;
+      --ok: #4cc9f0;
+      --shadow: 0 14px 40px rgba(0,0,0,0.45);
+      --r: 18px;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(1100px 700px at 18% 10%, rgba(255,0,110,0.18), transparent 60%),
+        radial-gradient(900px 600px at 85% 18%, rgba(76,201,240,0.14), transparent 55%),
+        radial-gradient(900px 700px at 55% 85%, rgba(255,183,3,0.12), transparent 60%),
+        var(--bg);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      font-size: 32px;
+      margin: 0 0 10px;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, var(--hot), var(--hot2), var(--ok));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .header p {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 0;
+    }
+    .game-area {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      aspect-ratio: 16/9;
+      background: linear-gradient(180deg, rgba(0,0,0,0.4), rgba(7,6,11,0.8));
+      border: 2px solid var(--line);
+      border-radius: var(--r);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .targets-row {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 100%;
+      padding: 20px;
+      gap: 15px;
+    }
+    .target-cup {
+      width: 80px;
+      height: 100px;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .target-cup:hover {
+      transform: scale(1.1);
+    }
+    .target-cup.hit {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+    .cup-svg {
+      width: 100%;
+      height: 100%;
+    }
+    .ball {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      pointer-events: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      z-index: 10;
+    }
+    .aimer {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .aimer-line {
+      position: absolute;
+      bottom: 60px;
+      left: 50%;
+      transform-origin: bottom center;
+      width: 2px;
+      height: 200px;
+      background: linear-gradient(to top, var(--hot), transparent);
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    .aimer-controls {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+    .aim-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 2px solid var(--line);
+      background: rgba(255,255,255,0.1);
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+    }
+    .aim-btn:hover {
+      background: rgba(255,255,255,0.2);
+      transform: scale(1.1);
+    }
+    .aim-btn:active {
+      transform: scale(0.95);
+    }
+    .shoot-btn {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: 3px solid var(--hot);
+      background: linear-gradient(135deg, var(--hot2), var(--ok));
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+      box-shadow: 0 4px 15px rgba(255,0,110,0.4);
+    }
+    .shoot-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(255,0,110,0.6);
+    }
+    .shoot-btn:active {
+      transform: scale(0.95);
+    }
+    .shoot-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .power-meter {
+      position: absolute;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 20px;
+      background: rgba(0,0,0,0.6);
+      border: 2px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+      display: none;
+    }
+    .power-meter.active {
+      display: block;
+    }
+    .power-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--hot), var(--hot2), var(--ok));
+      width: 0%;
+      transition: width 0.05s linear;
+      border-radius: 8px;
+    }
+    .power-label {
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .score {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.6);
+      padding: 10px 20px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .score-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+    .win-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(10px);
+    }
+    .win-modal.show {
+      display: flex;
+    }
+    .win-content {
+      text-align: center;
+      padding: 40px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+      border: 2px solid var(--hot);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      max-width: 500px;
+      animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    @keyframes popIn {
+      from {
+        transform: scale(0.5);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    .win-content h2 {
+      font-size: 48px;
+      margin: 0 0 20px;
+      background: linear-gradient(135deg, var(--hot), var(--hot2), var(--ok));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .win-content p {
+      font-size: 24px;
+      margin: 0 0 30px;
+      color: var(--text);
+    }
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background: var(--hot);
+      position: absolute;
+      animation: confetti-fall linear;
+      pointer-events: none;
+    }
+    @keyframes confetti-fall {
+      to {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    .back-link {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 10px 20px;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+    .back-link:hover {
+      background: rgba(255,255,255,0.1);
+      transform: translateY(-2px);
+    }
+    @media (max-width: 600px) {
+      .header h1 {
+        font-size: 24px;
+      }
+      .target-cup {
+        width: 60px;
+        height: 75px;
+      }
+      .aimer {
+        width: 100%;
+        padding: 0 20px;
+      }
+      .aim-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+      }
+      .shoot-btn {
+        width: 60px;
+        height: 60px;
+        font-size: 14px;
+      }
+      .win-content {
+        padding: 30px 20px;
+      }
+      .win-content h2 {
+        font-size: 36px;
+      }
+      .win-content p {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-link">← Back to Album</a>
+  
+  <div class="container">
+    <div class="header">
+      <h1>BAR SKILLS CHALLENGE</h1>
+      <p>Paddle Certified • Chalk Dust Champion • State of the Bar</p>
+      <p style="font-size: 12px; margin-top: 5px;">Hit all 5 targets to win!</p>
+    </div>
+
+    <div class="game-area" id="gameArea">
+      <div class="score">
+        <div class="score-label">Targets Hit</div>
+        <div id="scoreDisplay">0 / 5</div>
+      </div>
+
+      <div class="aimer-line" id="aimerLine"></div>
+
+      <div class="targets-row" id="targetsRow">
+        <div class="target-cup" data-target="0">
+          <svg class="cup-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+            <path d="M30 20 L70 20 L75 100 L25 100 Z" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="2"/>
+            <ellipse cx="50" cy="20" rx="20" ry="5" fill="rgba(255,255,255,0.3)"/>
+            <path d="M35 25 L65 25" stroke="white" stroke-width="1" opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="target-cup" data-target="1">
+          <svg class="cup-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+            <path d="M30 20 L70 20 L75 100 L25 100 Z" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="2"/>
+            <ellipse cx="50" cy="20" rx="20" ry="5" fill="rgba(255,255,255,0.3)"/>
+            <path d="M35 25 L65 25" stroke="white" stroke-width="1" opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="target-cup" data-target="2">
+          <svg class="cup-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+            <path d="M30 20 L70 20 L75 100 L25 100 Z" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="2"/>
+            <ellipse cx="50" cy="20" rx="20" ry="5" fill="rgba(255,255,255,0.3)"/>
+            <path d="M35 25 L65 25" stroke="white" stroke-width="1" opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="target-cup" data-target="3">
+          <svg class="cup-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+            <path d="M30 20 L70 20 L75 100 L25 100 Z" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="2"/>
+            <ellipse cx="50" cy="20" rx="20" ry="5" fill="rgba(255,255,255,0.3)"/>
+            <path d="M35 25 L65 25" stroke="white" stroke-width="1" opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="target-cup" data-target="4">
+          <svg class="cup-svg" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+            <path d="M30 20 L70 20 L75 100 L25 100 Z" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="2"/>
+            <ellipse cx="50" cy="20" rx="20" ry="5" fill="rgba(255,255,255,0.3)"/>
+            <path d="M35 25 L65 25" stroke="white" stroke-width="1" opacity="0.5"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="power-meter" id="powerMeter">
+        <div class="power-label">Power</div>
+        <div class="power-fill" id="powerFill"></div>
+      </div>
+
+      <div class="aimer">
+        <div class="aimer-controls">
+          <button class="aim-btn" id="aimLeft">←</button>
+          <button class="shoot-btn" id="shootBtn">HOLD TO CHARGE</button>
+          <button class="aim-btn" id="aimRight">→</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="win-modal" id="winModal">
+    <div class="win-content">
+      <h2>🎉 HAPPY BIRTHDAY! 🎉</h2>
+      <p>You're Bar Skills Certified!</p>
+      <p style="font-size: 16px; color: var(--muted); margin-top: 20px;">
+        No speeches. No sermons. Just evidence.<br/>
+        You got the skills. Now go celebrate.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const gameArea = document.getElementById('gameArea');
+    const aimerLine = document.getElementById('aimerLine');
+    const aimLeft = document.getElementById('aimLeft');
+    const aimRight = document.getElementById('aimRight');
+    const shootBtn = document.getElementById('shootBtn');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const targetsRow = document.getElementById('targetsRow');
+    const winModal = document.getElementById('winModal');
+    const powerMeter = document.getElementById('powerMeter');
+    const powerFill = document.getElementById('powerFill');
+    const targets = Array.from(document.querySelectorAll('.target-cup'));
+
+    let aimAngle = 0;
+    let score = 0;
+    let isShooting = false;
+    let isCharging = false;
+    let powerLevel = 0;
+    let chargeInterval = null;
+    const maxAngle = 45;
+    const minPower = 10; // Minimum power to shoot
+    const maxPower = 100; // Maximum power
+    const baseVelocity = 5; // Base velocity multiplier
+
+    function updateAimer() {
+      aimerLine.style.transform = `translateX(-50%) rotate(${aimAngle}deg)`;
+    }
+
+    aimLeft.addEventListener('click', () => {
+      if (isShooting) return;
+      aimAngle = Math.max(-maxAngle, aimAngle - 5);
+      updateAimer();
+    });
+
+    aimRight.addEventListener('click', () => {
+      if (isShooting) return;
+      aimAngle = Math.min(maxAngle, aimAngle + 5);
+      updateAimer();
+    });
+
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+      if (isShooting) return;
+      if (e.code === 'ArrowLeft') {
+        aimAngle = Math.max(-maxAngle, aimAngle - 5);
+        updateAimer();
+      } else if (e.code === 'ArrowRight') {
+        aimAngle = Math.min(maxAngle, aimAngle + 5);
+        updateAimer();
+      } else if (e.code === 'Space') {
+        e.preventDefault();
+        if (!isCharging && !isShooting) {
+          startCharging();
+        }
+      }
+    });
+
+    document.addEventListener('keyup', (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        stopCharging();
+      }
+    });
+
+    function startCharging() {
+      if (isShooting || score >= 5 || isCharging) return;
+      
+      isCharging = true;
+      powerLevel = minPower;
+      powerMeter.classList.add('active');
+      powerFill.style.width = powerLevel + '%';
+      
+      chargeInterval = setInterval(() => {
+        if (powerLevel < maxPower) {
+          powerLevel = Math.min(maxPower, powerLevel + 2);
+          powerFill.style.width = powerLevel + '%';
+        }
+      }, 20);
+    }
+
+    function stopCharging() {
+      if (!isCharging) return;
+      
+      isCharging = false;
+      if (chargeInterval) {
+        clearInterval(chargeInterval);
+        chargeInterval = null;
+      }
+      
+      if (powerLevel >= minPower) {
+        shoot(powerLevel);
+      }
+      
+      powerMeter.classList.remove('active');
+      powerLevel = 0;
+      powerFill.style.width = '0%';
+    }
+
+    function shoot(power = minPower) {
+      if (isShooting || score >= 5) return;
+      
+      isShooting = true;
+      shootBtn.disabled = true;
+
+      const ball = document.createElement('div');
+      ball.className = 'ball';
+      const startX = gameArea.offsetWidth / 2;
+      const startY = gameArea.offsetHeight - 100;
+      ball.style.left = startX + 'px';
+      ball.style.bottom = '100px';
+      gameArea.appendChild(ball);
+
+      const angle = aimAngle * Math.PI / 180;
+      // Power affects velocity - more power = faster ball
+      const velocity = baseVelocity + (power / maxPower) * 12; // Range: 5-17
+      let x = startX;
+      let y = startY;
+      let vx = Math.sin(angle) * velocity;
+      let vy = -Math.cos(angle) * velocity;
+      const gravity = 0.25; // Slightly reduced gravity for better reach
+
+      function animate() {
+        vy += gravity;
+        x += vx;
+        y += vy;
+
+        ball.style.left = x + 'px';
+        ball.style.bottom = y + 'px';
+
+        // Check collision with targets
+        targets.forEach((target, index) => {
+          if (target.classList.contains('hit')) return;
+          
+          const rect = target.getBoundingClientRect();
+          const gameRect = gameArea.getBoundingClientRect();
+          const targetX = rect.left - gameRect.left + rect.width / 2;
+          const targetY = gameRect.bottom - rect.bottom - rect.height / 2;
+
+          const dx = x - targetX;
+          const dy = y - targetY;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < 40) {
+            target.classList.add('hit');
+            score++;
+            scoreDisplay.textContent = `${score} / 5`;
+            ball.remove();
+            isShooting = false;
+            shootBtn.disabled = false;
+
+            if (score >= 5) {
+              setTimeout(() => {
+                showWin();
+              }, 500);
+            }
+            return;
+          }
+        });
+
+        // Check if ball is out of bounds
+        if (x < -50 || x > gameArea.offsetWidth + 50 || y > gameArea.offsetHeight + 50) {
+          ball.remove();
+          isShooting = false;
+          shootBtn.disabled = false;
+          return;
+        }
+
+        if (isShooting) {
+          requestAnimationFrame(animate);
+        }
+      }
+
+      animate();
+    }
+
+    // Mouse/touch controls for charging
+    shootBtn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      startCharging();
+    });
+
+    shootBtn.addEventListener('mouseup', (e) => {
+      e.preventDefault();
+      stopCharging();
+    });
+
+    shootBtn.addEventListener('mouseleave', () => {
+      stopCharging();
+    });
+
+    // Touch controls
+    shootBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      startCharging();
+    });
+
+    shootBtn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      stopCharging();
+    });
+
+    shootBtn.addEventListener('touchcancel', () => {
+      stopCharging();
+    });
+
+    function showWin() {
+      winModal.classList.add('show');
+      createConfetti();
+    }
+
+    function createConfetti() {
+      const colors = ['#ffb703', '#ff006e', '#4cc9f0', '#8338ec', '#f9c74f'];
+      const confettiCount = 100;
+
+      for (let i = 0; i < confettiCount; i++) {
+        setTimeout(() => {
+          const confetti = document.createElement('div');
+          confetti.className = 'confetti';
+          confetti.style.left = Math.random() * 100 + '%';
+          confetti.style.top = '-10px';
+          confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.width = (Math.random() * 10 + 5) + 'px';
+          confetti.style.height = (Math.random() * 10 + 5) + 'px';
+          confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+          confetti.style.animationDelay = Math.random() * 0.5 + 's';
+          document.body.appendChild(confetti);
+
+          setTimeout(() => {
+            confetti.remove();
+          }, 5000);
+        }, i * 20);
+      }
+    }
+
+    // Touch controls for mobile
+    let touchStartX = 0;
+    gameArea.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+    });
+
+    gameArea.addEventListener('touchmove', (e) => {
+      if (isShooting) return;
+      const touchX = e.touches[0].clientX;
+      const deltaX = touchX - touchStartX;
+      aimAngle = Math.max(-maxAngle, Math.min(maxAngle, aimAngle + deltaX * 0.1));
+      touchStartX = touchX;
+      updateAimer();
+    });
+
+    gameArea.addEventListener('touchend', (e) => {
+      // Touch controls handled by shoot button
+    });
+
+    // Initialize
+    updateAimer();
+  </script>
+</body>
+</html>

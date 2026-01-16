@@ -4,10 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#07060b" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="description" content="THE LEGEND OF ZAY — An EchoStory Birthday Album. Mobile-first audio player with 10 tracks and multiple versions." />
-  <link rel="manifest" href="data:application/json,{}" />
   <title>THE LEGEND OF ZAY — EchoStory</title>
   <style>
     :root {
@@ -1838,7 +1838,7 @@ State of the bar, he the bouncer’s choice</pre>
       5: ['scooter_science_(sometimes).mp3', 'scooter_science_(sometimes)_(1).mp3'],
       6: ['chihuahua_security.mp3', 'chihuahua_security_(1).mp3', 'tinyassdog.mp3'],
       7: ['mario_kart_court.mp3', 'mario_kart_court_(1).mp3', 'mario_kart_court_(2).mp3', 'mario_kart_court_(3).mp3'],
-      8: ['crystal_clear_ice_cold.mp3', 'crystal_clear_ice_cold_(1).mp3', 'crystal_clear_ice_cold_(2).mp3', 'crystal_clear_ice_cold_(3).mp3', 'crystal_clear_ice_cold_(4).mp3'],
+      8: ['crystal_clear_ice_cold.mp3', 'crystal_clear_ice_cold_(1).mp3', 'crystal_clear_ice_cold_(2).mp3', 'crystal_clear_ice_cold_(3).mp3', 'crystal_clear_ice_cold_(4).mp3', 'crystal_clear,_ice_cold_(dragon_smoke.mp3', 'crystal_clear,_ice_cold_(dragon_smoke_(1).mp3'],
       9: ['chalk_dust_champion.mp3', 'chalk_dust_champion_(1).mp3'],
       10: ['state_of_the_bar_(wrestle_energy).mp3', 'state_of_the_bar_(wrestle_energy)_(1).mp3']
     };
@@ -1913,22 +1913,21 @@ State of the bar, he the bouncer’s choice</pre>
         
         // Set source and load
         audio.src = filename;
-        
-        // Try to load and play as soon as possible
-        const loadPromise = audio.load();
-        
-        // Set up play handler for when audio is ready
-        const playWhenReady = () => {
-          if (audio.readyState >= 2) {
-            audio.removeEventListener('canplay', playWhenReady);
-            audio.removeEventListener('loadeddata', playWhenReady);
-            // Don't auto-play here - let playTrack handle it
+        try {
+          const loadPromise = audio.load();
+          if (loadPromise && typeof loadPromise.catch === 'function') {
+            loadPromise.catch(err => {
+              console.error('Audio load failed:', err);
+              audioError = err;
+              isLoading = false;
+              player.classList.remove('player-loading');
+              playerTitle.classList.add('player-error');
+              playerTitle.textContent = trackData.title + ' (Error loading)';
+              updatePlayState(false);
+            });
           }
-        };
-        audio.addEventListener('canplay', playWhenReady, { once: true });
-        audio.addEventListener('loadeddata', playWhenReady, { once: true });
-        
-        loadPromise.catch(err => {
+        } catch (err) {
+          // Some browsers don't return a promise from load()
           console.error('Audio load failed:', err);
           audioError = err;
           isLoading = false;
@@ -1936,7 +1935,7 @@ State of the bar, he the bouncer’s choice</pre>
           playerTitle.classList.add('player-error');
           playerTitle.textContent = trackData.title + ' (Error loading)';
           updatePlayState(false);
-        });
+        }
       }
 
       // Update track card states
@@ -2100,7 +2099,7 @@ State of the bar, he the bouncer’s choice</pre>
             if (err.name !== 'NotAllowedError') {
               // Try once more after brief delay
               setTimeout(() => {
-                if (audio.src && !audio.paused) {
+                if (audio.src) {
                   audio.play().then(() => {
                     updatePlayState(true);
                     audioError = null;
@@ -2123,13 +2122,18 @@ State of the bar, he the bouncer’s choice</pre>
       if (wasDifferentTrack) {
         // Wait for audio source to be set and ready
         const playWhenReady = () => {
-          if (audio.src && audio.readyState >= 2) {
-            attemptPlay();
-          } else if (audio.src) {
-            // Source is set but not ready - wait for canplay
-            audio.addEventListener('canplay', () => {
+          if (audio.src) {
+            if (audio.readyState >= 2) {
+              // Ready to play
               attemptPlay();
-            }, { once: true });
+            } else {
+              // Wait for canplay event
+              const playOnReady = () => {
+                attemptPlay();
+              };
+              audio.addEventListener('canplay', playOnReady, { once: true });
+              audio.addEventListener('loadeddata', playOnReady, { once: true });
+            }
           } else {
             // Source not set yet - check again
             setTimeout(playWhenReady, 20);
@@ -2138,10 +2142,7 @@ State of the bar, he the bouncer’s choice</pre>
         setTimeout(playWhenReady, 20);
       } else {
         // Same track - try to play immediately
-        if (!attemptPlay()) {
-          // If it failed, wait a moment and try again
-          setTimeout(attemptPlay, 50);
-        }
+        attemptPlay();
       }
     }
 
@@ -2321,7 +2322,6 @@ State of the bar, he the bouncer’s choice</pre>
     $$('.track').forEach(card => {
       let clickTimer = null;
       let longPressTimer = null;
-      let lastClickTime = 0;
       let lastClickTime = 0;
       
       // Preload on hover for instant playback

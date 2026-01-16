@@ -1790,11 +1790,16 @@ State of the bar, he the bouncer’s choice</pre>
       $('#closeBtn').focus();
     }
 
+    // Track cards now use playTrack handler below - modal can be opened via other means if needed
+    // Keeping keyboard handler for modal access
     $$('.track').forEach(card => {
-      card.addEventListener('click', () => openTrack(card));
       card.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault(); openTrack(card);
+          const trackNum = parseInt(card.getAttribute('data-track'), 10);
+          if (trackNum) {
+            e.preventDefault();
+            playTrack(trackNum);
+          }
         }
       });
     });
@@ -1921,8 +1926,12 @@ State of the bar, he the bouncer’s choice</pre>
         }
       });
 
-      // Show player
+      // Show player (ensure it's visible)
       player.classList.add('visible');
+      // Force display in case CSS is hiding it
+      if (player.style.display === 'none') {
+        player.style.display = '';
+      }
 
       // Update Media Session
       updateMediaSession(trackData);
@@ -2040,8 +2049,15 @@ State of the bar, he the bouncer’s choice</pre>
     }
 
     function playTrack(trackNum) {
+      // Always update player to ensure it's visible
       if (currentTrack !== trackNum) {
         updatePlayer(trackNum);
+      } else {
+        // Even if same track, ensure player is visible
+        player.classList.add('visible');
+        if (player.style.display === 'none') {
+          player.style.display = '';
+        }
       }
       audio.play().then(() => {
         updatePlayState(true);

@@ -8,6 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="description" content="THE LEGEND OF ZAY — An EchoStory Birthday Album. Mobile-first audio player with 10 tracks and multiple versions." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='fg' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23ff006e'/><stop offset='1' stop-color='%234cc9f0'/></linearGradient></defs><rect width='64' height='64' fill='%2307060b'/><path d='M32 12 L52 32 L32 52 L12 32 Z' fill='url(%23fg)' opacity='0.9'/><path d='M28 28 L36 32 L28 36 Z' fill='white' opacity='0.8'/></svg>" type="image/svg+xml" />
   <title>THE LEGEND OF ZAY — EchoStory</title>
   <style>
     :root {
@@ -48,7 +49,22 @@
     }
     .topbar-inner{max-width:1100px;margin:0 auto;padding:12px 18px;display:flex;gap:12px;align-items:center;justify-content:space-between}
     .brand{display:flex;gap:12px;align-items:center;min-width:0}
-    .mark{width:40px;height:40px;border-radius:12px;background: linear-gradient(135deg, rgba(255,0,110,0.85), rgba(76,201,240,0.75)); box-shadow: var(--shadow); border:1px solid rgba(255,255,255,0.14)}
+    .mark{
+      width:40px;
+      height:40px;
+      border-radius:12px;
+      background: linear-gradient(135deg, rgba(255,0,110,0.85), rgba(76,201,240,0.75));
+      box-shadow: var(--shadow);
+      border:1px solid rgba(255,255,255,0.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .mark svg {
+      width: 24px;
+      height: 24px;
+    }
     .brand h1{margin:0;font-size:14px;letter-spacing:1.2px}
     .brand .sub{margin:0;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .nav{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
@@ -510,7 +526,19 @@
   <div class="topbar">
     <div class="topbar-inner">
       <div class="brand" title="An EchoStory Birthday Album (10 Tracks)">
-        <div class="mark"></div>
+        <div class="mark">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true">
+            <defs>
+              <linearGradient id="iconGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#ffffff" stop-opacity="0.95"/>
+                <stop offset="1" stop-color="#ffffff" stop-opacity="0.7"/>
+              </linearGradient>
+            </defs>
+            <path d="M32 8 L56 32 L32 56 L8 32 Z" fill="url(#iconGrad)" opacity="0.9"/>
+            <path d="M28 28 L36 32 L28 36 Z" fill="#07060b" opacity="0.8"/>
+            <circle cx="32" cy="32" r="2" fill="#07060b" opacity="0.6"/>
+          </svg>
+        </div>
         <div style="min-width:0">
           <h1>THE LEGEND OF ZAY</h1>
           <p class="sub">An EchoStory Birthday Album (10 Tracks)</p>
@@ -533,7 +561,7 @@
         <div class="subtitle">No speeches. No sermons. Just evidence.</div>
         <p class="tagline">
           Ten tracks. Ten receipts. Zero speeches.<br/>
-          Built for late nights, side bets, and that “run it back” energy.
+          Built for late nights, side bets, and that "run it back" energy.
         </p>
         <div class="meta">
           <span class="pill">Mode: Bar Bounce / Neon / Chaos</span>
@@ -548,13 +576,13 @@ Note: Artwork is vector-based & editable (self-contained). Replace covers anytim
 
       <div class="card">
         <div class="story">
-          <b>How to read this:</b> click any cover to open it full-size + see the vibe tag.<br/><br/>
+          <b>How to use this:</b> Click any track cover to play. Double-click to cycle through versions. Use the player controls at the bottom for playback.<br/><br/>
           <div class="callout">
-            <b>Album rule:</b> we’re not here to crown anybody.<br/>
-            We’re here to document the pattern: win, laugh, repeat.
+            <b>Album rule:</b> We're not here to crown anybody.<br/>
+            We're here to document the pattern: win, laugh, repeat.
           </div>
           <div class="callout" style="margin-top:10px">
-            <b>Interludes:</b> short “found audio” scenes that stitch the night together.
+            <b>Interludes:</b> Short "found audio" scenes that stitch the night together.
           </div>
         </div>
       </div>
@@ -1583,10 +1611,11 @@ State of the bar, he the bouncer’s choice</pre>
       <div class="card">
         <div class="story">
           <b>Project:</b> THE LEGEND OF ZAY — An EchoStory Birthday Album (10 Tracks)<br/>
-          <b>Delivery:</b> one self-contained HTML file (offline-friendly).<br/>
-          <b>Notes:</b> Covers are SVG (editable). Swap titles/artist text instantly without losing layout.
-          <div class="callout">
-            Want to replace any cover with a photo/AI render later? Drop a PNG/JPG into the <span class="kbd">COVERS</span> object in the JSON below and the page can render it instead of the SVG.
+          <b>Delivery:</b> One self-contained HTML file (offline-friendly, mobile-optimized).<br/>
+          <b>Format:</b> Single-file player with embedded SVG artwork and full audio playback support.<br/>
+          <b>Notes:</b> All covers are SVG (editable). Swap titles/artist text instantly without losing layout. Multiple versions per track available.
+          <div class="callout" style="margin-top: 12px;">
+            <b>Customization:</b> Want to replace any cover with a photo/AI render later? Drop a PNG/JPG into the <span class="kbd">COVERS</span> object in the JSON below and the page can render it instead of the SVG.
           </div>
         </div>
         <details class="ly">
@@ -1597,7 +1626,10 @@ State of the bar, he the bouncer’s choice</pre>
           <pre id="jsonOut"></pre>
         </details>
       </div>
-      <div class="footer">EchoStory file generated 2026-01-16 03:26. Built for quick sharing + future upgrades (audio embeds, real cover art, credits). 🥂</div>
+      <div class="footer">
+        <b>Credits:</b> EchoVerse _ AeroVista<br/>
+        EchoStory file generated 2026-01-16 03:26. Built for quick sharing, mobile playback, and future upgrades. 🥂
+      </div>
     </div>
   </div>
 
@@ -1669,7 +1701,7 @@ State of the bar, he the bouncer’s choice</pre>
   <script type="application/json" id="albumData">{
   "title": "THE LEGEND OF ZAY",
   "subtitle": "An EchoStory Birthday Album (10 Tracks)",
-  "artist": "EchoVerse Presents",
+      "artist": "EchoVerse _ AeroVista",
   "tagline": "No speeches. No sermons. Just evidence.",
   "tracks": [
     {

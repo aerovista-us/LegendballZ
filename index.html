@@ -6,6 +6,8 @@
   <meta name="theme-color" content="#07060b" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="description" content="THE LEGEND OF ZAY — An EchoStory Birthday Album. Mobile-first audio player with 10 tracks and multiple versions." />
+  <link rel="manifest" href="data:application/json,{}" />
   <title>THE LEGEND OF ZAY — EchoStory</title>
   <style>
     :root {
@@ -120,9 +122,16 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:10px;
+      padding:12px 10px 16px 10px;
+      overflow:visible;
     }
-    .cover svg{width:100%;height:100%;border-radius:14px;box-shadow: 0 10px 24px rgba(0,0,0,0.45)}
+    .cover svg{
+      width:100%;
+      height:100%;
+      border-radius:14px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.45);
+      overflow:visible;
+    }
     .track-body{padding:10px 12px 12px}
     .track h3{margin:0;font-size:13px;letter-spacing:.6px}
     .track .vibe{margin:6px 0 0;color:var(--muted);font-size:12px}
@@ -349,12 +358,56 @@
       width: 24px;
       height: 24px;
     }
+    .player-version {
+      font-size: 10px;
+      color: var(--muted2);
+      margin-top: 2px;
+      text-align: center;
+    }
+    .version-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      font-size: 10px;
+      font-weight: 600;
+    }
+    .version-btn:hover,
+    .version-btn:active {
+      transform: scale(0.95);
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.2);
+    }
     .track.playing {
       border-color: var(--hot);
       background: rgba(255,183,3,0.08);
     }
     .track.playing .cover {
       box-shadow: 0 0 20px rgba(255,183,3,0.3);
+    }
+    .track-version-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 4px 8px;
+      font-size: 10px;
+      color: rgba(255,255,255,0.9);
+      font-weight: 600;
+      pointer-events: none;
+      z-index: 10;
     }
     @media (max-width: 600px) {
       .player-content {
@@ -378,6 +431,11 @@
         width: 44px;
         height: 44px;
       }
+      .version-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 9px;
+      }
     }
     /* Progress bar */
     .player-progress {
@@ -394,6 +452,57 @@
       background: linear-gradient(90deg, var(--hot2), var(--ok));
       width: 0%;
       transition: width 0.1s linear;
+    }
+    /* Loading state */
+    .player-loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    .player-loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: var(--hot);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    /* Smooth transitions */
+    .track {
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
+                  border-color 0.2s ease, 
+                  background 0.2s ease,
+                  box-shadow 0.2s ease;
+    }
+    .player-btn {
+      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+                  background 0.15s ease,
+                  border-color 0.15s ease;
+    }
+    /* Focus states for accessibility */
+    .player-btn:focus-visible,
+    .version-btn:focus-visible,
+    .track:focus-visible {
+      outline: 2px solid var(--ok);
+      outline-offset: 2px;
+    }
+    /* Error state */
+    .player-error {
+      color: var(--hot2);
+    }
+    /* Haptic feedback simulation */
+    @media (hover: none) and (pointer: coarse) {
+      .player-btn:active,
+      .version-btn:active {
+        transform: scale(0.92);
+      }
     }
   </style>
 </head>
@@ -1535,17 +1644,21 @@ State of the bar, he the bouncer’s choice</pre>
       <div class="player-info">
         <div class="player-title" id="playerTitle">No track selected</div>
         <div class="player-artist" id="playerArtist">THE LEGEND OF ZAY</div>
+        <div class="player-version" id="playerVersion"></div>
       </div>
       <div class="player-controls">
-        <button class="player-btn" id="prevBtn" aria-label="Previous track" title="Previous">
-          <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+        <button class="player-btn" id="prevBtn" aria-label="Previous track" title="Previous (←)" tabindex="0">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
         </button>
-        <button class="player-btn play-pause" id="playPauseBtn" aria-label="Play/Pause" title="Play">
-          <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-          <svg id="pauseIcon" viewBox="0 0 24 24" style="display:none"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>
+        <button class="player-btn play-pause" id="playPauseBtn" aria-label="Play/Pause" title="Play/Pause (Space)" tabindex="0">
+          <svg id="playIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="pauseIcon" viewBox="0 0 24 24" style="display:none" aria-hidden="true"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>
         </button>
-        <button class="player-btn" id="nextBtn" aria-label="Next track" title="Next">
-          <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6zm11-12v12h2V6z"/></svg>
+        <button class="player-btn" id="nextBtn" aria-label="Next track" title="Next (→)" tabindex="0">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18l8.5-6L6 6zm11-12v12h2V6z"/></svg>
+        </button>
+        <button class="version-btn" id="versionBtn" aria-label="Next version" title="Cycle version (V key)" tabindex="0">
+          <span id="versionText">v1</span>
         </button>
       </div>
     </div>
@@ -1703,37 +1816,68 @@ State of the bar, he the bouncer’s choice</pre>
     const playerTitle = $('#playerTitle');
     const playerArtist = $('#playerArtist');
     const playerArtwork = $('#playerArtwork');
+    const playerVersion = $('#playerVersion');
     const progressBar = $('#progressBar');
     const playIcon = $('#playIcon');
     const pauseIcon = $('#pauseIcon');
+    const versionBtn = $('#versionBtn');
+    const versionText = $('#versionText');
 
-    // MP3 file mapping (normalized filenames)
+    // MP3 file mapping - arrays for multiple versions
     const trackFiles = {
-      1: 'greyhound_season.mp3',
-      2: 'paddle_certified.mp3',
-      3: 'graveyard_next_door.mp3',
-      4: 'the_door_nobody_talks_about.mp3',
-      5: 'scooter_science_(sometimes).mp3',
-      6: 'chihuahua_security.mp3',
-      7: 'mario_kart_court.mp3',
-      8: 'crystal_clear_ice_cold.mp3',
-      9: 'chalk_dust_champion.mp3',
-      10: 'state_of_the_bar_(wrestle_energy).mp3'
+      1: ['greyhound_season.mp3', 'greyhound_season_(1).mp3'],
+      2: ['paddle_certified.mp3', 'paddle_certified_(1).mp3'],
+      3: ['graveyard_next_door.mp3', 'graveyard_next_door_(1).mp3', 'graveyard_next_door_(2).mp3', 'graveyard_next_door_(3).mp3'],
+      4: ['the_door_nobody_talks_about.mp3', 'the_door_nobody_talks_about_(1).mp3', 'the_door_nobody_talks_about_(2).mp3', 'the_door_nobody_talks_about_(3).mp3'],
+      5: ['scooter_science_(sometimes).mp3', 'scooter_science_(sometimes)_(1).mp3'],
+      6: ['chihuahua_security.mp3', 'chihuahua_security_(1).mp3', 'tinyassdog.mp3'],
+      7: ['mario_kart_court.mp3', 'mario_kart_court_(1).mp3', 'mario_kart_court_(2).mp3', 'mario_kart_court_(3).mp3'],
+      8: ['crystal_clear_ice_cold.mp3', 'crystal_clear_ice_cold_(1).mp3', 'crystal_clear_ice_cold_(2).mp3', 'crystal_clear_ice_cold_(3).mp3', 'crystal_clear_ice_cold_(4).mp3'],
+      9: ['chalk_dust_champion.mp3', 'chalk_dust_champion_(1).mp3'],
+      10: ['state_of_the_bar_(wrestle_energy).mp3', 'state_of_the_bar_(wrestle_energy)_(1).mp3']
     };
 
     let currentTrack = null;
+    let currentVersion = 0; // Index in the versions array
     let isPlaying = false;
+    let isLoading = false;
+    let audioError = null;
 
     // Update player UI
-    function updatePlayer(trackNum) {
+    function updatePlayer(trackNum, versionIndex = null) {
       const track = data.tracks.find(t => t.n === trackNum);
       if (!track) return;
 
       currentTrack = trackNum;
+      
+      // If versionIndex is provided, use it; otherwise keep current or reset to 0
+      if (versionIndex !== null) {
+        currentVersion = versionIndex;
+      } else if (currentTrack !== trackNum) {
+        currentVersion = 0; // Reset to first version when switching tracks
+      }
+      
       const trackData = data.tracks[trackNum - 1];
+      const versions = trackFiles[trackNum] || [];
+      
+      // Ensure version index is valid
+      if (currentVersion >= versions.length) {
+        currentVersion = 0;
+      }
       
       playerTitle.textContent = trackData.title;
       playerArtist.textContent = data.artist + ' • ' + trackData.vibe;
+      
+      // Update version display
+      if (versions.length > 1) {
+        playerVersion.textContent = `Version ${currentVersion + 1} of ${versions.length}`;
+        versionText.textContent = `v${currentVersion + 1}`;
+        versionBtn.style.display = 'flex';
+      } else {
+        playerVersion.textContent = '';
+        versionText.textContent = 'v1';
+        versionBtn.style.display = 'none';
+      }
       
       // Update artwork (use SVG from track card)
       const trackCard = $(`.track[data-track="${trackNum}"]`);
@@ -1742,13 +1886,29 @@ State of the bar, he the bouncer’s choice</pre>
         if (svg) {
           playerArtwork.innerHTML = svg.outerHTML;
         }
+        // Update version badge on track card
+        updateTrackVersionBadge(trackCard, currentVersion, versions.length);
       }
 
       // Load audio
-      const filename = trackFiles[trackNum];
+      const filename = versions[currentVersion];
       if (filename) {
+        isLoading = true;
+        audioError = null;
+        player.classList.add('player-loading');
+        
+        // Clear previous error state
+        playerTitle.classList.remove('player-error');
+        
         audio.src = filename;
-        audio.load();
+        audio.load().catch(err => {
+          console.error('Audio load failed:', err);
+          audioError = err;
+          isLoading = false;
+          player.classList.remove('player-loading');
+          playerTitle.classList.add('player-error');
+          playerTitle.textContent = trackData.title + ' (Error loading)';
+        });
       }
 
       // Update track card states
@@ -1766,6 +1926,45 @@ State of the bar, he the bouncer’s choice</pre>
 
       // Update Media Session
       updateMediaSession(trackData);
+    }
+
+    // Update version badge on track card
+    function updateTrackVersionBadge(card, versionIndex, totalVersions) {
+      let badge = card.querySelector('.track-version-badge');
+      if (totalVersions > 1) {
+        if (!badge) {
+          badge = document.createElement('div');
+          badge.className = 'track-version-badge';
+          card.querySelector('.cover').appendChild(badge);
+        }
+        badge.textContent = `v${versionIndex + 1}/${totalVersions}`;
+        badge.style.display = 'block';
+      } else if (badge) {
+        badge.style.display = 'none';
+      }
+    }
+
+    // Cycle to next version
+    function cycleVersion() {
+      if (!currentTrack) return;
+      const versions = trackFiles[currentTrack] || [];
+      if (versions.length <= 1) return;
+      
+      currentVersion = (currentVersion + 1) % versions.length;
+      const wasPlaying = isPlaying;
+      
+      updatePlayer(currentTrack, currentVersion);
+      
+      // Resume playback if it was playing
+      if (wasPlaying) {
+        audio.play().then(() => {
+          updatePlayState(true);
+          audioError = null;
+        }).catch(err => {
+          // Silent error handling
+          updatePlayState(false);
+        });
+      }
     }
 
     // Media Session API for background playback
@@ -1846,9 +2045,18 @@ State of the bar, he the bouncer’s choice</pre>
       }
       audio.play().then(() => {
         updatePlayState(true);
+        audioError = null;
+        playerTitle.classList.remove('player-error');
       }).catch(err => {
-        console.error('Playback failed:', err);
+        // Silent error handling - user-friendly
         updatePlayState(false);
+        if (err.name !== 'NotAllowedError') {
+          // Only show error if it's not a user-initiated block
+          const trackData = data.tracks[trackNum - 1];
+          if (trackData) {
+            playerTitle.classList.add('player-error');
+          }
+        }
       });
     }
 
@@ -1877,14 +2085,17 @@ State of the bar, he the bouncer’s choice</pre>
       } else {
         audio.play().then(() => {
           updatePlayState(true);
+          audioError = null;
         }).catch(err => {
-          console.error('Playback failed:', err);
+          // Silent error handling
+          updatePlayState(false);
         });
       }
     });
 
     prevBtn.addEventListener('click', playPrevious);
     nextBtn.addEventListener('click', playNext);
+    versionBtn.addEventListener('click', cycleVersion);
 
     // Audio events
     audio.addEventListener('ended', () => {
@@ -1899,27 +2110,101 @@ State of the bar, he the bouncer’s choice</pre>
     });
 
     audio.addEventListener('loadedmetadata', () => {
+      isLoading = false;
+      player.classList.remove('player-loading');
+      audioError = null;
+      
       if ('mediaSession' in navigator && navigator.mediaSession.metadata) {
         // Update position state for Media Session
         if ('setPositionState' in navigator.mediaSession) {
-          navigator.mediaSession.setPositionState({
-            duration: audio.duration,
-            playbackRate: audio.playbackRate,
-            position: audio.currentTime
-          });
+          try {
+            navigator.mediaSession.setPositionState({
+              duration: audio.duration,
+              playbackRate: audio.playbackRate,
+              position: audio.currentTime
+            });
+          } catch (e) {
+            // Some browsers don't support this
+          }
         }
       }
     });
 
-    // Make track cards playable
+    audio.addEventListener('error', (e) => {
+      isLoading = false;
+      player.classList.remove('player-loading');
+      audioError = e;
+      const trackData = data.tracks[currentTrack - 1];
+      if (trackData) {
+        playerTitle.classList.add('player-error');
+        playerTitle.textContent = trackData.title + ' (Error)';
+      }
+      updatePlayState(false);
+    });
+
+    audio.addEventListener('canplay', () => {
+      isLoading = false;
+      player.classList.remove('player-loading');
+    });
+
+    // Make track cards playable with version cycling
     $$('.track').forEach(card => {
+      let clickTimer = null;
+      let longPressTimer = null;
+      
       card.addEventListener('click', (e) => {
         const trackNum = parseInt(card.getAttribute('data-track'), 10);
         if (!trackNum) return;
         
-        // Play the track on click
-        playTrack(trackNum);
+        // Clear long press timer
+        if (longPressTimer) {
+          clearTimeout(longPressTimer);
+          longPressTimer = null;
+        }
+        
+        // Single click: play track
+        if (clickTimer) {
+          clearTimeout(clickTimer);
+          clickTimer = null;
+          // Double click: cycle version
+          cycleVersion();
+        } else {
+          clickTimer = setTimeout(() => {
+            clickTimer = null;
+            playTrack(trackNum);
+          }, 300);
+        }
       });
+      
+      // Long press: cycle version
+      card.addEventListener('touchstart', (e) => {
+        const trackNum = parseInt(card.getAttribute('data-track'), 10);
+        if (!trackNum) return;
+        
+        longPressTimer = setTimeout(() => {
+          if (currentTrack === trackNum) {
+            cycleVersion();
+          } else {
+            playTrack(trackNum);
+            setTimeout(() => cycleVersion(), 100);
+          }
+          longPressTimer = null;
+        }, 500);
+      });
+      
+      card.addEventListener('touchend', () => {
+        if (longPressTimer) {
+          clearTimeout(longPressTimer);
+          longPressTimer = null;
+        }
+      });
+      
+      // Initialize version badge
+      const trackNum = parseInt(card.getAttribute('data-track'), 10);
+      if (trackNum) {
+        const versions = trackFiles[trackNum] || [];
+        updateTrackVersionBadge(card, 0, versions.length);
+      }
     });
 
     // Prevent page from sleeping during playback (helps with background audio)
@@ -1928,11 +2213,9 @@ State of the bar, he the bouncer’s choice</pre>
       if ('wakeLock' in navigator) {
         try {
           wakeLock = await navigator.wakeLock.request('screen');
-          wakeLock.addEventListener('release', () => {
-            console.log('Wake lock released');
-          });
+          // Wake lock acquired
         } catch (err) {
-          console.log('Wake lock request failed:', err);
+          // Wake lock not supported or failed - silent fail
         }
       }
     }
@@ -1958,6 +2241,70 @@ State of the bar, he the bouncer’s choice</pre>
         // Keep playing in background (Media Session handles this)
       }
     });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      // Don't interfere with typing in inputs or modals
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || modal.classList.contains('open')) {
+        return;
+      }
+      
+      // Space: Play/Pause
+      if (e.code === 'Space' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        playPauseBtn.click();
+      }
+      // Arrow Left: Previous track
+      else if (e.code === 'ArrowLeft' && !e.shiftKey) {
+        e.preventDefault();
+        prevBtn.click();
+      }
+      // Arrow Right: Next track
+      else if (e.code === 'ArrowRight' && !e.shiftKey) {
+        e.preventDefault();
+        nextBtn.click();
+      }
+      // Shift + Arrow Right or V: Cycle version
+      else if ((e.code === 'ArrowRight' && e.shiftKey) || (e.code === 'KeyV' && !e.shiftKey && !e.ctrlKey && !e.metaKey)) {
+        e.preventDefault();
+        if (versionBtn.style.display !== 'none') {
+          versionBtn.click();
+        }
+      }
+      // Number keys 1-0: Play track
+      else if (e.code >= 'Digit1' && e.code <= 'Digit9') {
+        const trackNum = parseInt(e.code.replace('Digit', ''));
+        if (trackNum <= data.tracks.length) {
+          e.preventDefault();
+          playTrack(trackNum);
+        }
+      }
+      else if (e.code === 'Digit0') {
+        const trackNum = 10;
+        if (trackNum <= data.tracks.length) {
+          e.preventDefault();
+          playTrack(trackNum);
+        }
+      }
+    });
+
+    // Improve touch handling - prevent double-tap zoom on buttons
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (e) => {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, { passive: false });
+
+    // Add smooth scroll behavior
+    if (!('scrollBehavior' in document.documentElement.style)) {
+      // Polyfill for older browsers
+      const style = document.createElement('style');
+      style.textContent = 'html { scroll-behavior: smooth; }';
+      document.head.appendChild(style);
+    }
   </script>
 </body>
 </html>

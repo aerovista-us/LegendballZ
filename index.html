@@ -1,0 +1,1963 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#07060b" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>THE LEGEND OF ZAY — EchoStory</title>
+  <style>
+    :root {
+      --bg: #07060b;
+      --panel: rgba(255,255,255,0.06);
+      --panel2: rgba(255,255,255,0.08);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.66);
+      --muted2: rgba(255,255,255,0.46);
+      --line: rgba(255,255,255,0.12);
+      --hot: #ffb703;
+      --hot2:#ff006e;
+      --ok: #4cc9f0;
+      --shadow: 0 14px 40px rgba(0,0,0,0.45);
+      --r: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    }
+    *{box-sizing:border-box}
+    body {
+      margin:0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(1100px 700px at 18% 10%, rgba(255,0,110,0.18), transparent 60%),
+        radial-gradient(900px 600px at 85% 18%, rgba(76,201,240,0.14), transparent 55%),
+        radial-gradient(900px 700px at 55% 85%, rgba(255,183,3,0.12), transparent 60%),
+        var(--bg);
+      min-height:100vh;
+    }
+    a{color:inherit}
+    .wrap{max-width:1100px;margin:0 auto;padding:28px 18px 120px}
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(to bottom, rgba(7,6,11,0.85), rgba(7,6,11,0.55));
+      border-bottom: 1px solid var(--line);
+    }
+    .topbar-inner{max-width:1100px;margin:0 auto;padding:12px 18px;display:flex;gap:12px;align-items:center;justify-content:space-between}
+    .brand{display:flex;gap:12px;align-items:center;min-width:0}
+    .mark{width:40px;height:40px;border-radius:12px;background: linear-gradient(135deg, rgba(255,0,110,0.85), rgba(76,201,240,0.75)); box-shadow: var(--shadow); border:1px solid rgba(255,255,255,0.14)}
+    .brand h1{margin:0;font-size:14px;letter-spacing:1.2px}
+    .brand .sub{margin:0;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .nav{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .chip {
+      font-size:12px; padding:8px 10px; border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,0.06);
+      cursor:pointer; user-select:none;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+    }
+    .chip:hover{transform: translateY(-1px); background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.18)}
+    .hero {
+      padding: 26px 0 10px;
+      display:grid; grid-template-columns: 1.25fr 0.75fr; gap:18px;
+      align-items: stretch;
+    }
+    @media (max-width: 900px){ .hero{grid-template-columns:1fr} }
+    .card {
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.04));
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+    }
+    .hero .card{padding:18px}
+    .title {
+      font-size: 34px; line-height: 1.04; margin: 0 0 10px;
+      letter-spacing: 1px;
+    }
+    .subtitle{margin:0 0 10px; color: var(--muted); font-size: 14px}
+    .tagline{margin:10px 0 0; font-size: 14px; color: rgba(255,255,255,0.88)}
+    .meta {
+      display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;
+    }
+    .pill {
+      font-size:12px; padding:7px 10px; border-radius:999px;
+      border:1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.25);
+      color: rgba(255,255,255,0.82);
+    }
+    .log {
+      padding:14px 16px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(255,255,255,0.78);
+      border-top:1px solid var(--line);
+      background: rgba(0,0,0,0.18);
+      border-radius: 0 0 var(--r) var(--r);
+      white-space: pre-wrap;
+      line-height: 1.4;
+    }
+    .grid {
+      margin-top: 18px;
+      display:grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 980px){ .grid{grid-template-columns: repeat(3, 1fr)} }
+    @media (max-width: 560px){ .grid{grid-template-columns: repeat(2, 1fr)} }
+    .track {
+      overflow:hidden;
+      position:relative;
+      cursor:pointer;
+      transition: transform .14s ease, border-color .14s ease, background .14s ease;
+    }
+    .track:hover{transform: translateY(-2px); border-color: rgba(255,255,255,0.22); background: rgba(255,255,255,0.08)}
+    .cover {
+      width:100%;
+      aspect-ratio: 1 / 1;
+      border-bottom:1px solid var(--line);
+      background: rgba(0,0,0,0.2);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px;
+    }
+    .cover svg{width:100%;height:100%;border-radius:14px;box-shadow: 0 10px 24px rgba(0,0,0,0.45)}
+    .track-body{padding:10px 12px 12px}
+    .track h3{margin:0;font-size:13px;letter-spacing:.6px}
+    .track .vibe{margin:6px 0 0;color:var(--muted);font-size:12px}
+    .track .catch{margin:8px 0 0;color:rgba(255,255,255,0.86);font-size:12px}
+    .section{margin-top: 22px}
+    .section h2{margin:0 0 10px; font-size: 18px; letter-spacing: .8px}
+    .story {
+      padding: 16px 16px 14px;
+      line-height: 1.55;
+      color: rgba(255,255,255,0.86);
+    }
+    .story b{color: rgba(255,255,255,0.95)}
+    .story .callout {
+      margin-top: 12px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.22);
+      color: rgba(255,255,255,0.84);
+    }
+    details.ly {
+      border-top:1px solid var(--line);
+      padding: 12px 16px;
+    }
+    details.ly summary {
+      cursor:pointer;
+      list-style:none;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.9);
+    }
+    details.ly summary::-webkit-details-marker {display:none}
+    .sum-left{display:flex;align-items:center;gap:10px;min-width:0}
+    .badge {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.25);
+      color: rgba(255,255,255,0.8);
+      flex: 0 0 auto;
+    }
+    .sum-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .sum-right{font-family: var(--mono); font-size: 11px; color: var(--muted2)}
+    pre {
+      margin: 12px 0 2px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.28);
+      color: rgba(255,255,255,0.86);
+      overflow:auto;
+      line-height: 1.5;
+      font-family: var(--mono);
+      font-size: 12px;
+      white-space: pre-wrap;
+    }
+    .interludes {
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:12px;
+      margin-top: 12px;
+    }
+    @media (max-width: 900px){ .interludes{grid-template-columns: 1fr} }
+    .interlude{padding:12px 14px}
+    .interlude h3{margin:0 0 6px; font-size: 13px; letter-spacing: .6px}
+    .interlude p{margin:0; color: var(--muted); font-size: 12px; line-height:1.45}
+    .footer {
+      margin-top: 22px;
+      padding: 14px 16px;
+      color: var(--muted2);
+      font-size: 12px;
+      border-top: 1px solid var(--line);
+    }
+    /* modal */
+    .modal {
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background: rgba(0,0,0,0.72); z-index: 100;
+      padding: 18px;
+    }
+    .modal.open{display:flex}
+    .modal-card {
+      max-width: 980px; width: 100%;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.05));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .modal-head {
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding: 12px 14px;
+      border-bottom:1px solid var(--line);
+      background: rgba(0,0,0,0.22);
+    }
+    .modal-head .left{display:flex; gap:10px; align-items:center; min-width:0}
+    .xbtn {
+      font-size:12px; padding:8px 10px; border-radius:12px;
+      border:1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.25);
+      color: rgba(255,255,255,0.85);
+      cursor:pointer;
+    }
+    .xbtn:hover{background: rgba(0,0,0,0.35)}
+    .modal-body{display:grid; grid-template-columns: 1fr 1.2fr; gap:0}
+    @media (max-width: 900px){ .modal-body{grid-template-columns:1fr} }
+    .modal-cover{padding: 14px; border-right:1px solid var(--line)}
+    @media (max-width: 900px){ .modal-cover{border-right:0; border-bottom:1px solid var(--line)} }
+    .modal-cover .frame{border-radius:16px; overflow:hidden; border:1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.2)}
+    .modal-cover .frame svg{width:100%;height:auto;display:block}
+    .modal-info{padding:14px}
+    .modal-info h3{margin:0 0 8px; font-size:16px; letter-spacing:.7px}
+    .modal-info .kv{font-size:12px; color: var(--muted); line-height:1.55}
+    .modal-info .quote{margin-top:10px; padding:10px 12px; border-radius:14px; border:1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.22); color: rgba(255,255,255,0.88); font-size:12px}
+    .kbd{font-family: var(--mono); font-size:11px; padding:2px 6px; border:1px solid rgba(255,255,255,0.16); border-bottom-width:2px; border-radius:8px; color: rgba(255,255,255,0.8)}
+    /* Audio Player - Mobile First */
+    .audio-player {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: linear-gradient(to top, rgba(7,6,11,0.98), rgba(7,6,11,0.95));
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--line);
+      padding: 12px 16px;
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
+      box-shadow: 0 -4px 24px rgba(0,0,0,0.4);
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+    .audio-player.visible {
+      transform: translateY(0);
+    }
+    .player-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .player-artwork {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .player-artwork img,
+    .player-artwork svg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .player-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .player-title {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text);
+    }
+    .player-artist {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .player-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .player-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .player-btn:active {
+      transform: scale(0.95);
+      background: rgba(255,255,255,0.12);
+    }
+    .player-btn.play-pause {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, rgba(255,0,110,0.3), rgba(76,201,240,0.3));
+      border-color: rgba(255,255,255,0.2);
+    }
+    .player-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+    .player-btn.play-pause svg {
+      width: 24px;
+      height: 24px;
+    }
+    .track.playing {
+      border-color: var(--hot);
+      background: rgba(255,183,3,0.08);
+    }
+    .track.playing .cover {
+      box-shadow: 0 0 20px rgba(255,183,3,0.3);
+    }
+    @media (max-width: 600px) {
+      .player-content {
+        gap: 10px;
+      }
+      .player-artwork {
+        width: 48px;
+        height: 48px;
+      }
+      .player-title {
+        font-size: 13px;
+      }
+      .player-artist {
+        font-size: 11px;
+      }
+      .player-btn {
+        width: 40px;
+        height: 40px;
+      }
+      .player-btn.play-pause {
+        width: 44px;
+        height: 44px;
+      }
+    }
+    /* Progress bar */
+    .player-progress {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: rgba(255,255,255,0.1);
+      overflow: hidden;
+    }
+    .player-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--hot2), var(--ok));
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand" title="An EchoStory Birthday Album (10 Tracks)">
+        <div class="mark"></div>
+        <div style="min-width:0">
+          <h1>THE LEGEND OF ZAY</h1>
+          <p class="sub">An EchoStory Birthday Album (10 Tracks)</p>
+        </div>
+      </div>
+      <div class="nav">
+        <div class="chip" data-jump="#tracks">Tracks</div>
+        <div class="chip" data-jump="#story">EchoStory</div>
+        <div class="chip" data-jump="#lyrics">Lyrics</div>
+        <div class="chip" data-jump="#credits">Credits</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="hero">
+      <div class="card">
+        <div class="title">THE LEGEND OF ZAY</div>
+        <div class="subtitle">No speeches. No sermons. Just evidence.</div>
+        <p class="tagline">
+          Ten tracks. Ten receipts. Zero speeches.<br/>
+          Built for late nights, side bets, and that “run it back” energy.
+        </p>
+        <div class="meta">
+          <span class="pill">Mode: Bar Bounce / Neon / Chaos</span>
+          <span class="pill">Rating: R (language & vibes)</span>
+          <span class="pill">Format: Single-file EchoStory</span>
+          <span class="pill">Tip: Press <span class="kbd">Esc</span> to close art view</span>
+        </div>
+        <div class="log">Generated: 2026-01-16 03:26
+Theme: dark neon / cinematic cards
+Note: Artwork is vector-based & editable (self-contained). Replace covers anytime.</div>
+      </div>
+
+      <div class="card">
+        <div class="story">
+          <b>How to read this:</b> click any cover to open it full-size + see the vibe tag.<br/><br/>
+          <div class="callout">
+            <b>Album rule:</b> we’re not here to crown anybody.<br/>
+            We’re here to document the pattern: win, laugh, repeat.
+          </div>
+          <div class="callout" style="margin-top:10px">
+            <b>Interludes:</b> short “found audio” scenes that stitch the night together.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="tracks">
+      <h2>Track Covers</h2>
+      <div class="grid">
+        
+        <div class="card track" tabindex="0"
+          data-track="1"
+          data-title="Greyhound Season"
+          data-vibe="crunchy alt-hip-hop / bar bounce"
+          data-catch="Crack the can, no speeches—just legends in the species.">
+          <div class="cover"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Track 1 cover">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffb703"/>
+      <stop offset="1" stop-color="#fb8500"/>
+    </linearGradient>
+    <filter id="n1">
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch" />
+      <feColorMatrix type="saturate" values="0" />
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.18"/>
+      </feComponentTransfer>
+    </filter>
+    <filter id="glow1" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.2" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="64" height="64" fill="#0b0f19"/>
+  <rect width="64" height="64" fill="url(#g1)" opacity="0.22"/>
+  <rect width="64" height="64" filter="url(#n1)" opacity=".9"/>
+  <g transform="translate(0,0)" filter="url(#glow1)">
+    <!-- Greyhound silhouette running -->
+    <path d="M16 40c2-4 6-6 10-4s6 4 8 2c2-2 4-6 8-4s6 6 4 8" fill="none" stroke="white" stroke-width="2.5" opacity=".7" stroke-linecap="round"/>
+    <circle cx="20" cy="36" r="3" fill="white" opacity=".6"/>
+    <path d="M18 42l2 4M22 42l2 4" stroke="white" stroke-width="2" opacity=".6"/>
+    <!-- Can icon -->
+    <rect x="42" y="20" width="8" height="12" rx="1" fill="none" stroke="white" stroke-width="2" opacity=".7"/>
+    <path d="M42 22h8M42 28h8" stroke="white" stroke-width="1.5" opacity=".5"/>
+    <text x="32" y="58" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="6.5" fill="white" opacity=".95" font-weight="800" letter-spacing="0.5">
+      <tspan x="32" dy="0">GREYHOUND SEASON</tspan>
+    </text>
+  </g>
+</svg></div>
+          <div class="track-body">
+            <h3>01. Greyhound Season</h3>
+            <div class="vibe">crunchy alt-hip-hop / bar bounce</div>
+            <div class="catch">“Crack the can, no speeches—just legends in the species.”</div>
+          </div>
+        </div>
+        <div class="card track" tabindex="0"
+          data-track="2"
+          data-title="Paddle Certified"
+          data-vibe="funky breakbeat / ping-pong hustler swagger"
+          data-catch="He don’t warm up—he just wins. Double down.">
+          <div class="cover"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Track 2 cover">
+  <defs>
+    <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff006e"/>
+      <stop offset="1" stop-color="#8338ec"/>
+    </linearGradient>
+    <filter id="n2">
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch" />
+      <feColorMatrix type="saturate" values="0" />
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.18"/>
+      </feComponentTransfer>
+    </filter>
+    <filter id="glow2" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.2" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="64" height="64" fill="#06040a"/>
+  <rect width="64" height="64" fill="url(#g2)" opacity="0.22"/>
+  <rect width="64" height="64" filter="url(#n2)" opacity=".9"/>
+  <g transform="translate(0,0)" filter="url(#glow2)">
+    <!-- Ping pong paddle -->
+    <rect x="20" y="18" width="20" height="28" rx="3" fill="none" stroke="white" stroke-width="2.5" opacity=".7"/>
+    <rect x="22" y="20" width="16" height="24" rx="2" fill="none" stroke="white" stroke-width="1.5" opacity=".5"/>
+    <!-- Ping pong ball with motion lines -->
+    <circle cx="46" cy="32" r="5" fill="white" opacity=".8"/>
+    <path d="M40 32h4M50 28l2-2M50 36l2 2" stroke="white" stroke-width="1.5" opacity=".6" stroke-linecap="round"/>
+    <text x="32" y="58" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="6.5" fill="white" opacity=".95" font-weight="800" letter-spacing="0.5">
+      <tspan x="32" dy="0">PADDLE CERTIFIED</tspan>
+    </text>
+  </g>
+</svg></div>
+          <div class="track-body">
+            <h3>02. Paddle Certified</h3>
+            <div class="vibe">funky breakbeat / ping-pong hustler swagger</div>
+            <div class="catch">“He don’t warm up—he just wins. Double down.”</div>
+          </div>
+        </div>
+        <div class="card track" tabindex="0"
+          data-track="3"
+          data-title="Graveyard Next Door"
+          data-vibe="dark synthwave / neon-haunted"
+          data-catch="If the party gets quiet, the neighbors are already.">
+          <div class="cover"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Track 3 cover">
+  <defs>
+    <linearGradient id="g3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#00f5d4"/>
+      <stop offset="1" stop-color="#00bbf9"/>
+    </linearGradient>
+    <filter id="n3">
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch" />
+      <feColorMatrix type="saturate" values="0" />
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.18"/>
+      </feComponentTransfer>
+    </filter>
+    <filter id="glow3" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.2" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="64" height="64" fill="#050712"/>
+  <rect width="64" height="64" fill="url(#g3)" opacity="0.22"/>
+  <rect width="64" height="64" filter="url(#n3)" opacity=".9"/>
+  <g transform="translate(0,0)" filter="url(#glow3)">
+    <!-- Tombstones -->
+    <path d="M20 46V32l6-4 6 4v14M36 46V30l4-3 4 3v16" fill="none" stroke="white" stroke-width="2" opacity=".6"/>
+    <rect x="22" y="32" width="8" height="14" rx="1" fill="none" stroke="white" stroke-width="2" opacity=".5"/>
+    <rect x="38" y="30" width="6" height="16" rx="1" fill="none" stroke="white" stroke-width="2" opacity=".5"/>
+    <!-- Cross -->
+    <path d="M26 36h4M28 34v4" stroke="white" stroke-width="1.5" opacity=".4"/>
+    <!-- Moon -->
+    <circle cx="48" cy="18" r="6" fill="none" stroke="white" stroke-width="2" opacity=".5"/>
+    <path d="M45 18a3 3 0 0 1 3-3" fill="white" opacity=".3"/>
+    <text x="32" y="58" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="6" fill="white" opacity=".95" font-weight="800" letter-spacing="0.5">
+      <tspan x="32" dy="0">GRAVEYARD NEXT</tspan><tspan x="32" dy="8">DOOR</tspan>
+    </text>
+  </g>
+</svg></div>
+          <div class="track-body">
+            <h3>03. Graveyard Next Door</h3>
+            <div class="vibe">dark synthwave / neon-haunted</div>
+            <div class="catch">“If the party gets quiet, the neighbors are already.”</div>
+          </div>
+        </div>
+        <div class="card track" tabindex="0"
+          data-track="4"
+          data-title="The Door Nobody Talks About"
+          data-vibe="cinematic trap / mystery swagger"
+          data-catch="Bro… what is that?">
+          <div class="cover"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Track 4 cover">
+  <defs>
+    <linearGradient id="g4" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f72585"/>
+      <stop offset="1" stop-color="#4cc9f0"/>
+    </linearGradient>
+    <filter id="n4">
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch" />
+      <feColorMatrix type="saturate" values="0" />
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.18"/>
+      </feComponentTransfer>
+    </filter>
+    <filter id="glow4" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.2" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="64" height="64" fill="#07060b"/>
+  <rect width="64" height="64" fill="url(#g4)" opacity="0.22"/>
+  <rect width="64" height="64" filter="url(#n4)" opacity=".9"/>
+  <g transform="translate(0,0)" filter="url(#glow4)">
+    <!-- Mysterious door -->
+    <rect x="24" y="20" width="20" height="28" rx="2" fill="none" stroke="white" stroke-width="2.5" opacity=".7"/>
+    <rect x="26" y="22" width="16" height="24" rx="1" fill="none" stroke="white" stroke-width="1.5" opacity=".4"/>
+    <!-- Door handle -->
+    <circle cx="40" cy="34" r="2.5" fill="white" opacity=".6"/>
+    <path d="M40 34l2 0" stroke="white" stroke-width="1.5" opacity=".5" stroke-linecap="round"/>
+    <!-- Question mark -->
+    <text x="32" y="38" text-anchor="middle" font-family="system-ui" font-size="12" fill="white" opacity=".5" font-weight="bold">?</text>
+    <!-- Cracks/hidden seams -->
+    <path d="M28 26l2-1M30 30l1-1" stroke="white" stroke-width="1" opacity=".3" stroke-linecap="round"/>
+    <text x="32" y="58" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="5.5" fill="white" opacity=".95" font-weight="800" letter-spacing="0.5">
+      <tspan x="32" dy="0">THE DOOR NOBODY</tspan><tspan x="32" dy="7">TALKS ABOUT</tspan>
+    </text>
+  </g>
+</svg></div>
+          <div class="track-body">
+            <h3>04. The Door Nobody Talks About</h3>
+            <div class="vibe">cinematic trap / mystery swagger</div>
+            <div class="catch">“Bro… what is that?”</div>
+          </div>
+        </div>
+        <div class="card track" tabindex="0"
+          data-track="5"
+          data-title="Scooter Science (Sometimes)"
+          data-vibe="punk-rap / chaotic DIY energy"
+          data-catch="Sometimes it works… sometimes it’s a lesson.">
+          <div class="cover"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Track 5 cover">
+  <defs>
+    <linearGradient id="g5" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffbe0b"/>
+      <stop offset="1" stop-color="#ff006e"/>
+    </linearGradient>
+    <filter id="n5">
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch" />
+      <feColorMatrix type="saturate" values="0" />
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.18"/>
+      </feComponentTransfer>
+    </filter>
+    <filter id="glow5" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.2" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="64" height="64" fill="#05050a"/>
+  <rect width="64" height="64" fill="url(#g5)" opacity="0.22"/>
+  <rect width="64" height="64" filter="url(#n5)" opacity=".9"/>
+  <g transform="translate(0,0)" filter="url(#glow5)">
+    <!-- Scooter -->
+    <path d="M18 42h28" stroke="white" stroke-width="3" opacity=".7" stroke-linecap="round"/>
+    <circle cx="24" cy="42" r="4" fill="none" stroke="white" stroke-width="2" opacity=".6"/>
+    <circle cx="40" cy="42" r="4" fill="none" stroke="white" stroke-width="2" opacity=".6"/>
+    <path d="M28 42V30l4-4 4 4v12" fill="none" stroke="white" stroke-width="2.5" opacity=".7"/>
+    <path d="M30 28h4" stroke="white" stroke-width="2" opacity=".6" stroke-linecap="round"/>
+    <!-- Wrench/tool -->
+    <path d="M44 24l4-2 2 2-2 4-4-2z" fill="none" stroke="white" stroke-width="2" opacity=".5"/>
+    <text x="32" y="58" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="5.5" fill="white" opacity=".95" font-weight="800" letter-spacing="0.5">
+      <tspan x="32" dy="0">SCOOTER SCIENCE</tspan><tspan x="32" dy="7">(SOMETIMES)</tspan>
+    </text>
+  </g>
+</svg></div>
+          <div class="track-body">
+            <h3>05. Scooter Science (Sometimes)</h3>
+            <div class="vibe">punk-rap / chaotic DIY energy</div>
+            <div class="catch">“Sometimes it works… sometimes it’s a lesson.”</div>
+          </div>
+        </div>
+        <div class="card track" tabindex="0"
+          data-track="6"
+          data-title="Chihuahua Security"
+          data-vibe="west-coast bounce / comedic menace"
+          data-catch="Small frame, big blame—don’t cross the hallway boss.">
+          <div class="cover"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Track 6 cover">
+  <defs>
+    <linearGradient id="g6" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#80ed99"/>
+      <stop offset="1" stop-color="#57cc99"/>
+    </linearGradient>
+    <filter id="n6">
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch" />
+      <feColorMatrix type="saturate" values="0" />
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.18"/>
+      </feComponentTransfer>
+    </filter>
+    <filter id="glow6" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.2" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="64" height="64" fill="#07100d"/>
+  <rect width="64" height="64" fill="url(#g6)" opacity="0.22"/>
+  <rect width="64" height="64" filter="url(#n6)" opacity=".9"/>
+  <g transform="translate(0,0)" filter="url(#glow6)">
+    <!-- Chihuahua -->
+    <path d="M32 42c0-6 4-6 4 0" fill="none" stroke="white" stroke-width="2.5" opacity=".7" stroke-linecap="round"/>
+    <path d="M28 32c2-4 4-6 8-6s6 2 8 6" fill="none" stroke="white" stroke-width="2.5" opacity=".7" stroke-linecap="round"/>
+    <circle cx="30" cy="34" r="2" fill="white" opacity=".7"/>
+    <circle cx="38" cy="34" r="2" fill="white" opacity=".7"/>
+    <!-- Ears -->
+    <path d="M26 28l2-4 2 2M38 30l2-4 2 2" fill="none" stroke="white" stroke-width="2" opacity=".6" stroke-linecap="round"/>
+    <!-- Security badge -->
+    <circle cx="48" cy="20" r="5" fill="none" stroke="white" stroke-width="2" opacity=".6"/>
+    <text x="48" y="23" text-anchor="middle" font-family="system-ui" font-size="6" fill="white" opacity=".7" font-weight="bold">!</text>
+    <text x="32" y="58" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="6" fill="white" opacity=".95" font-weight="800" letter-spacing="0.5">
+      <tspan x="32" dy="0">CHIHUAHUA</tspan><tspan x="32" dy="8">SECURITY</tspan>
+    </text>
+  </g>
+</svg></div>
+          <div class="track-body">
+            <h3>06. Chihuahua Security</h3>
+            <div class="vibe">west-coast bounce / comedic menace</div>
+            <div class="catch">“Small frame, big blame—don’t cross the hallway boss.”</div>
+          </div>
+        </div>
+        <div class="card track" tabindex="0"
+          data-track="7"
+          data-title="Mario Kart Court"
+          data-vibe="8-bit + modern bass / game-night anthem"
+          data-catch="Friendly race… until it isn’t.">
+          <div class="cover"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Track 7 cover">
+  <defs>
+    <linearGradient id="g7" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4361ee"/>
+      <stop offset="1" stop-color="#4cc9f0"/>
+    </linearGradient>
+    <filter id="n7">
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch" />
+      <feColorMatrix type="saturate" values="0" />
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.18"/>
+      </feComponentTransfer>
+    </filter>
+    <filter id="glow7" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.2" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="64" height="64" fill="#050712"/>
+  <rect width="64" height="64" fill="url(#g7)" opacity="0.22"/>
+  <rect width="64" height="64" filter="url(#n7)" opacity=".9"/>
+  <g transform="translate(0,0)" filter="url(#glow7)">
+    <!-- Kart -->
+    <path d="M24 32c2-4 6-6 10-6s8 2 10 6v8c0 3-3 4-6 3l-2-1-2 1c-3 1-6 0-6-3z" fill="none" stroke="white" stroke-width="2.5" opacity=".7"/>
+    <!-- Wheels -->
+    <circle cx="28" cy="42" r="3" fill="none" stroke="white" stroke-width="2" opacity=".6"/>
+    <circle cx="40" cy="42" r="3" fill="none" stroke="white" stroke-width="2" opacity=".6"/>
+    <!-- Driver -->
+    <circle cx="36" cy="34" r="2.5" fill="white" opacity=".6"/>
+    <!-- Checkered flag -->
+    <rect x="46" y="18" width="6" height="8" fill="white" opacity=".5"/>
+    <path d="M46 22h6M46 26h6" stroke="#050712" stroke-width="1" opacity=".8"/>
+    <text x="32" y="58" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="6.5" fill="white" opacity=".95" font-weight="800" letter-spacing="0.5">
+      <tspan x="32" dy="0">MARIO KART COURT</tspan>
+    </text>
+  </g>
+</svg></div>
+          <div class="track-body">
+            <h3>07. Mario Kart Court</h3>
+            <div class="vibe">8-bit + modern bass / game-night anthem</div>
+            <div class="catch">“Friendly race… until it isn’t.”</div>
+          </div>
+        </div>
+        <div class="card track" tabindex="0"
+          data-track="8"
+          data-title="Crystal Clear, Ice Cold"
+          data-vibe="smooth nocturnal funk / late-night drink track"
+          data-catch="Cold and clean. All night, always up.">
+          <div class="cover"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Track 8 cover">
+  <defs>
+    <linearGradient id="g8" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f9c74f"/>
+      <stop offset="1" stop-color="#90be6d"/>
+    </linearGradient>
+    <filter id="n8">
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch" />
+      <feColorMatrix type="saturate" values="0" />
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.18"/>
+      </feComponentTransfer>
+    </filter>
+    <filter id="glow8" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.2" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="64" height="64" fill="#070a0f"/>
+  <rect width="64" height="64" fill="url(#g8)" opacity="0.22"/>
+  <rect width="64" height="64" filter="url(#n8)" opacity=".9"/>
+  <g transform="translate(0,0)" filter="url(#glow8)">
+    <!-- Glass with ice -->
+    <path d="M26 22h16l-1 24H27z" fill="none" stroke="white" stroke-width="2.5" opacity=".7"/>
+    <path d="M28 24h12" stroke="white" stroke-width="2" opacity=".5"/>
+    <!-- Ice cubes -->
+    <rect x="30" y="28" width="4" height="4" rx="0.5" fill="white" opacity=".6"/>
+    <rect x="36" y="32" width="4" height="4" rx="0.5" fill="white" opacity=".6"/>
+    <rect x="32" y="36" width="3" height="3" rx="0.5" fill="white" opacity=".5"/>
+    <!-- Condensation lines -->
+    <path d="M28 30l1-1M34 28l1-1M40 32l1-1" stroke="white" stroke-width="1" opacity=".4" stroke-linecap="round"/>
+    <text x="32" y="58" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="6" fill="white" opacity=".95" font-weight="800" letter-spacing="0.5">
+      <tspan x="32" dy="0">CRYSTAL CLEAR,</tspan><tspan x="32" dy="8">ICE COLD</tspan>
+    </text>
+  </g>
+</svg></div>
+          <div class="track-body">
+            <h3>08. Crystal Clear, Ice Cold</h3>
+            <div class="vibe">smooth nocturnal funk / late-night drink track</div>
+            <div class="catch">“Cold and clean. All night, always up.”</div>
+          </div>
+        </div>
+        <div class="card track" tabindex="0"
+          data-track="9"
+          data-title="Chalk Dust Champion"
+          data-vibe="bluesy hip-hop / smoky pool hall swagger"
+          data-catch="He don’t call bank shots—he calls outcomes.">
+          <div class="cover"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Track 9 cover">
+  <defs>
+    <linearGradient id="g9" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f3722c"/>
+      <stop offset="1" stop-color="#f94144"/>
+    </linearGradient>
+    <filter id="n9">
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch" />
+      <feColorMatrix type="saturate" values="0" />
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.18"/>
+      </feComponentTransfer>
+    </filter>
+    <filter id="glow9" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.2" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="64" height="64" fill="#0b0f19"/>
+  <rect width="64" height="64" fill="url(#g9)" opacity="0.22"/>
+  <rect width="64" height="64" filter="url(#n9)" opacity=".9"/>
+  <g transform="translate(0,0)" filter="url(#glow9)">
+    <!-- Pool table -->
+    <rect x="18" y="26" width="32" height="20" rx="2" fill="none" stroke="white" stroke-width="2.5" opacity=".7"/>
+    <rect x="20" y="28" width="28" height="16" rx="1" fill="none" stroke="white" stroke-width="1.5" opacity=".5"/>
+    <!-- Pool balls -->
+    <circle cx="24" cy="34" r="2.5" fill="white" opacity=".7"/>
+    <circle cx="44" cy="38" r="2.5" fill="white" opacity=".7"/>
+    <!-- Cue stick -->
+    <path d="M14 20l8 8" stroke="white" stroke-width="2" opacity=".6" stroke-linecap="round"/>
+    <!-- Chalk dust particles -->
+    <circle cx="22" cy="22" r="1" fill="white" opacity=".5"/>
+    <circle cx="26" cy="20" r="0.8" fill="white" opacity=".4"/>
+    <circle cx="20" cy="24" r="0.8" fill="white" opacity=".4"/>
+    <text x="32" y="58" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="6" fill="white" opacity=".95" font-weight="800" letter-spacing="0.5">
+      <tspan x="32" dy="0">CHALK DUST</tspan><tspan x="32" dy="8">CHAMPION</tspan>
+    </text>
+  </g>
+</svg></div>
+          <div class="track-body">
+            <h3>09. Chalk Dust Champion</h3>
+            <div class="vibe">bluesy hip-hop / smoky pool hall swagger</div>
+            <div class="catch">“He don’t call bank shots—he calls outcomes.”</div>
+          </div>
+        </div>
+        <div class="card track" tabindex="0"
+          data-track="10"
+          data-title="State of the Bar (Wrestle Energy)"
+          data-vibe="heavy halftime banger / victory lap"
+          data-catch="He’s not bragging—he’s demonstrating.">
+          <div class="cover"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Track 10 cover">
+  <defs>
+    <linearGradient id="g10" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffd60a"/>
+      <stop offset="1" stop-color="#ff7b00"/>
+    </linearGradient>
+    <filter id="n10">
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch" />
+      <feColorMatrix type="saturate" values="0" />
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.18"/>
+      </feComponentTransfer>
+    </filter>
+    <filter id="glow10" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.2" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="64" height="64" fill="#07060b"/>
+  <rect width="64" height="64" fill="url(#g10)" opacity="0.22"/>
+  <rect width="64" height="64" filter="url(#n10)" opacity=".9"/>
+  <g transform="translate(0,0)" filter="url(#glow10)">
+    <!-- Wrestling belt/championship -->
+    <path d="M22 42c6-6 18-6 24 0" fill="none" stroke="white" stroke-width="2.5" opacity=".7" stroke-linecap="round"/>
+    <rect x="28" y="28" width="12" height="6" rx="1" fill="none" stroke="white" stroke-width="2" opacity=".6"/>
+    <!-- Fist/strength symbol -->
+    <circle cx="32" cy="20" r="6" fill="none" stroke="white" stroke-width="2.5" opacity=".7"/>
+    <path d="M30 18l2 2 2-2M32 22v2" stroke="white" stroke-width="2" opacity=".6" stroke-linecap="round"/>
+    <!-- Energy lines -->
+    <path d="M20 24l2-2M44 24l-2-2M20 36l2 2M44 36l-2 2" stroke="white" stroke-width="1.5" opacity=".5" stroke-linecap="round"/>
+    <text x="32" y="58" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="5.5" fill="white" opacity=".95" font-weight="800" letter-spacing="0.5">
+      <tspan x="32" dy="0">STATE OF THE BAR</tspan><tspan x="32" dy="7">(WRESTLE ENERGY)</tspan>
+    </text>
+  </g>
+</svg></div>
+          <div class="track-body">
+            <h3>10. State of the Bar (Wrestle Energy)</h3>
+            <div class="vibe">heavy halftime banger / victory lap</div>
+            <div class="catch">“He’s not bragging—he’s demonstrating.”</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="story">
+      <h2>EchoStory Timeline</h2>
+      <div class="card">
+        <div class="story">
+          <b>Scene 1 — The Ritual:</b> cans crack, nobody gives a speech, and the night chooses a tempo.
+          Track 1 sets the rule and makes it repeatable.
+          <br/><br/>
+          <b>Scene 2 — The Hustle:</b> a paddle shows up, money shows up, and the room learns what “certified” means.
+          <br/><br/>
+          <b>Scene 3 — The Neighborhood:</b> the graveyard stays quiet until the party does—then it feels like it’s listening.
+          <br/><br/>
+          <b>Scene 4 — The Rumor:</b> the hallway. the seam. the “storage” explanation nobody believes.
+          <br/><br/>
+          <b>Scene 5 — The Science:</b> a scooter becomes a philosophy: sometimes it works… sometimes it teaches.
+          <br/><br/>
+          <b>Scene 6 — The Security:</b> the smallest bouncer in the building runs the whole operation.
+          <br/><br/>
+          <b>Scene 7 — The Court:</b> Mario Kart stops being friendly. evidence is presented.
+          <br/><br/>
+          <b>Scene 8 — The Late Shift:</b> cold glass, clean vibe, all-night focus.
+          <br/><br/>
+          <b>Scene 9 — The Felt Sermon:</b> chalk dust, quiet confidence, outcomes called in advance.
+          <br/><br/>
+          <b>Scene 10 — The Demonstration:</b> the bar remembers the old state energy and behaves accordingly.
+        </div>
+      </div>
+
+      <div class="interludes">
+        
+        <div class="card interlude">
+          <h3>Interlude A — Paddle Ranking Dispute</h3>
+          <p>A friendly accusation. A quick scoreboard check. Silence. Then laughter.</p>
+        </div>
+        <div class="card interlude">
+          <h3>Interlude B — Door Report (Classified)</h3>
+          <p>Someone swears they heard a latch. Nobody agrees on what that means. Everybody agrees to stop asking.</p>
+        </div>
+        <div class="card interlude">
+          <h3>Interlude C — Mario Kart Tribunal</h3>
+          <p>A blue-shell incident becomes a case. Evidence submitted: one screenshot, three witnesses, and a dog that won’t stop barking.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="lyrics">
+      <h2>Lyrics Vault</h2>
+      <div class="card">
+        
+        <details class="ly" open>
+          <summary>
+            <span class="sum-left">
+              <span class="badge">#01</span>
+              <span class="sum-title">Greyhound Season</span>
+            </span>
+            <span class="sum-right">crunchy alt-hip-hop / bar bounce</span>
+          </summary>
+          <pre>[Sound Style | Crunchy alt-hip-hop / bar bounce: mid-tempo halftime drums with dusty texture, punchy kick, tight snare/clap, and a warm rolling bass that “walks” under the hook. Add gritty guitar stabs or dirty keys, subtle crowd noise, and tiny can-crack / ice clink ear-candy. Verses stay dry and confident; hooks get wider with chant doubles and gang shouts. Keep it fun, not sentimental—pregame ritual energy, repeatable call-and-response, no long speeches.] 
+
+[Title | GREYHOUND SEASON]
+
+[Chorus A | chanty · bounce]  
+Crack the can — no speeches (no speeches)  
+Greyhound season — we pregame decent (decent)  
+No “happy tears,” no long-ass reasons  
+Just legends in the species, repeat it like a thesis  
+Crack the can — no speeches (no speeches)  
+Hands up, toast up — low-key undefeated (uh)  
+Night run smooth, no drama, no leeches  
+Just legends in the species — keep it on repeat, yeah
+
+[Verse 1 | crunchy drums · bar bounce]  
+Pull up light, no spotlight, no parade  
+No “you’re the greatest” — nah, we don’t do praise  
+We do real ones talkin’ over bass  
+Cans click twice, then the night finds a pace  
+Ice in the cup, glass look crystal-clear  
+But the vibe stay rowdy, the aim stay near  
+We here for the laugh and the “watch this” moment  
+One sip in and the whole room knows it  
+No essay, no toast that’s long as a lease  
+Just that grin when the beat hit— release  
+We don’t hype it up, we just press “play”  
+Greyhound season — same story, new day
+
+[Pre-Chorus | tighten · chant]  
+Say less… (say less)  
+Top shelf mood with the cheap-ass stress gone (gone)  
+No sappy songs, no “best man” poems  
+Just click and we back in our zone
+
+[Chorus B | ultra-loopable · crowd]  
+Crack—crack—crack the can, no speeches  
+Grey—grey—Greyhound season  
+No sappy, no clappin’, no preachin’  
+Just legends in the species  
+Crack—crack—crack the can, no speeches  
+Grey—grey—Greyhound season  
+Same crew, same wave, same reasons  
+Just legends in the species
+
+[Verse 2 | swagger · loose hats]  
+No speeches, just heat when the bassline land  
+Same faces, same laughs, same drink in hand  
+If it’s a birthday, cool—don’t make it a sermon  
+We celebrate best by keepin’ it workin’  
+No crown talk, no “king” in the room  
+Just a vibe that blooms when the cans go boom  
+Greyhound season, we ride that loop  
+Legends in the species—whole damn crew
+
+[Bridge | drop · hypnotic]  
+No speeches… no speeches…  
+Crack the can, no speeches…  
+Greyhound season — repeat this…  
+Legends in the species…  
+Legends in the species…
+
+[Final Chorus | bigger · shoutbacks]  
+Crack the can — no speeches (no speeches!)  
+Greyhound season — we pregame decent (decent!)  
+No sappy, no preachin’, no reasons  
+Just legends in the species (say it!)</pre>
+        </details>
+        
+        <details class="ly" >
+          <summary>
+            <span class="sum-left">
+              <span class="badge">#02</span>
+              <span class="sum-title">Paddle Certified</span>
+            </span>
+            <span class="sum-right">funky breakbeat / ping-pong hustler swagger</span>
+          </summary>
+          <pre>[Sound Style | Funky breakbeat hustler anthem: swung live-sounding breaks with vinyl grit, tight claps/snaps, rubbery walking bassline, wah-guitar chops and muted funk stabs, plus short brass hits. Tasteful ping-pong ticks as rhythmic ear-candy. Close-mic confident vocal; hooks widen with gang shouts (“certified!” “run it back!”). Money-game energy, playful brutality, no warmup, no mercy—just wagers and repeatable chants.]
+
+[Title | PADDLE CERTIFIED]
+
+[Chorus A | chanty · funk bounce]  
+Paddle certified — yeah, I’m bag approved  
+Put a bill on the table, watch your whole crew lose  
+He don’t warm up — he just wins (just wins)  
+Double down, run it back — do it again (again)  
+Paddle certified — got that wrist talk  
+One serve, two bounces — that’s a big walk  
+He don’t warm up — he just wins (just wins)  
+Say “best two outta three”? — I say ten (TEN)
+
+[Verse 1 | breakbeat · bass walk]  
+Walk in calm, no speech, no “what’s good?”  
+Paddle in hand like I’m up to no good  
+“Friendly game?” nah—put a twenty on it  
+Make it sting just enough so you really want it  
+Polite for a second—then I get rude with it  
+Backhand slice so nasty, need soap with it  
+Table talk loud till the first serve land  
+Then it’s mouths shut quick when the spin start bend  
+Ball hit edge like it know where you live  
+You reach, you miss—then you pay what you said you’d give  
+I don’t practice in public, I don’t do rehearsals  
+I do payments, receipts, and inverted little curves
+
+[Pre-Chorus | tighten · clap build]  
+You can stretch, you can flex, you can pray  
+I’m already up—I just came here to play  
+Want a warm-up round? man, that’s cute  
+Pay the fee… then I hand you the truth
+
+[Chorus B | ultra-loopable · crowd]  
+Bet. On. Ish.  
+He don’t warm up — he just wins.  
+Bet. On. Ish.  
+Double down — do it again.
+
+[Verse 2 | funkier · crowd adlibs]  
+They say “one more” — I say “name that price”  
+Now the whole damn room turn into dice  
+Ain’t no charity match, ain’t no mercy serve  
+I take your confidence first, then your nerve  
+Wrist so cold it don’t shake, it don’t sweat  
+Ball hit corner like it collectin’ a debt  
+Side bet king, I live for the “ohhh!”  
+When it dips last second and the crowd go raw  
+And if you talk slick, I grin real thin—  
+“Double or nothin’?” …you already in
+
+[Bridge | drop · sub only · whisper-crowd]  
+He don’t warm up… he just wins  
+You want a practice game? pay your sins  
+Run it back… watch him do it again</pre>
+        </details>
+        
+        <details class="ly" >
+          <summary>
+            <span class="sum-left">
+              <span class="badge">#03</span>
+              <span class="sum-title">Graveyard Next Door</span>
+            </span>
+            <span class="sum-right">dark synthwave / neon-haunted</span>
+          </summary>
+          <pre>[Sound Style | Dark neon synthwave: mid-tempo half-time pulse, deep rolling sub, gated snare snap, ticking hats like streetlights. Detuned analog pads with slow filter sweeps and a bright arpeggio like moonlight on chrome. Subtle wind hush, faint chimes, low choir ghost-notes—tasteful, not cheesy. Hooks widen with stereo stacks and chant underlayer. No gore—just cool haunted neighborhood energy.]
+
+[Title | GRAVEYARD NEXT DOOR]
+
+[Chorus | neon-haunted · chant]  
+Graveyard next door—like it’s normal, swear  
+Pull up to the porch, feel the cold in the air  
+If the party get quiet… the neighbors already  
+Yeah, the neighbors already  
+Graveyard next door—lights low, buzz steady  
+Cans crack, laughs loud, but the vibe stay ready  
+If the party get quiet… the neighbors already  
+Yeah, the neighbors already
+
+[Verse 1 | minimal · tension bass]  
+He live where the headstones line up like a crowd  
+But he grillin’ like “y’all want burgers or now?”  
+Street so dead it got perfect parking  
+Moon like a lamp and the fence keep watchin’  
+Friends pull up jokin’, then they lower they tone  
+’Cause the whole damn place feel like somebody home  
+Wind hit the trees, make a whispery hymn  
+He just shrug like “bro, that’s the soundtrack in ’em”  
+Neighbors don’t complain, they don’t text, they don’t stare  
+They just lay there quiet, like they already there
+
+[Pre-Chorus | tighten · arps rise]  
+We ain’t scared—just aware  
+Keep it loud till it ain’t  
+If the night holds its breath, that’s the cue—don’t blink
+
+[Verse 2 | synthwave bounce · dark humor]  
+Some folks got HOA, he got tombstone rows  
+No nosy old man—just a bunch of “I told”  
+Chihuahua at the window barkin’ at shadows  
+Like “I run this block,” little boss in a halo  
+Party get weird? he don’t flinch, don’t fold  
+He just taps the can: “keep the jokes cold.”
+
+[Bridge | drop · whisper doubles]  
+Hush hit the room—every laugh turn thin  
+That’s when you feel it on the back of your skin  
+Not spooky… just real  
+If it gets too quiet—yeah, you know the deal</pre>
+        </details>
+        
+        <details class="ly" >
+          <summary>
+            <span class="sum-left">
+              <span class="badge">#04</span>
+              <span class="sum-title">The Door Nobody Talks About</span>
+            </span>
+            <span class="sum-right">cinematic trap / mystery swagger</span>
+          </summary>
+          <pre>[Sound Style | Cinematic trap heist-core with seductive noir tension: 74 BPM, heavy 808 with subtle glides, crisp clap with short plate tail, skittering hats. Spy textures: low strings ostinato, muted brass stabs, plucky “code” motif. Subtle eerie shimmer (reversed swells, hallway hum), but playful not gory. Close-mic confident vocal with whispered doubles for “bro…listen.”]
+
+[Title | THE DOOR NOBODY TALKS ABOUT]
+
+[Chorus | conspiratorial · noir chant]  
+It’s the door nobody talks about (shh)  
+Not “boo”—more like “bro, what is that?”  
+One hand on the can, one eye on the route  
+Yeah, it’s the door nobody talks about  
+If the lights get low and the room get paused…  
+Yeah… it’s the door nobody talks about
+
+[Verse 1 | sneaky pocket]  
+He got that layout like a movie set  
+Walls too clean where the secrets get kept  
+Party loud, but that hallway hush  
+Like the air got rules and it don’t do much  
+Somebody asked once—he sipped, then grinned  
+“Storage.” (cap.) we all knew then  
+Corner seam look sharp, too straight, too slick  
+Like a hidden latch on some rich-boy shit  
+And every time somebody walk too near  
+The chihuahua show teeth like “not over here”
+
+[Pre-Chorus | hush]  
+Don’t stare too long, don’t ask too hard  
+He the type make a mystery feel like a guard  
+I’m not saying he’s hiding a vault…  
+I’m just saying—why that wall look false?
+
+[Verse 2 | heist swagger]  
+Couple homies swear they heard a latch click  
+Then a cold little breeze like a magic trick  
+Not horror-movie—more like nightlife weird  
+Like the house got a pulse when the crowd get near  
+He gone for a minute like “brb”  
+Came back smooth like “y’all still on that?” please  
+And if you knock twice… man, I swear that place  
+Hold its breath like it’s watchin’ your face</pre>
+        </details>
+        
+        <details class="ly" >
+          <summary>
+            <span class="sum-left">
+              <span class="badge">#05</span>
+              <span class="sum-title">Scooter Science (Sometimes)</span>
+            </span>
+            <span class="sum-right">punk-rap / chaotic DIY energy</span>
+          </summary>
+          <pre>[Sound Style | Punk-rap chaos: 156 BPM (or 78 halftime), distorted breaks, snappy clap, dirty bass guitar/808 hybrid that clips on purpose. Crunchy power-chord stabs, pick-scrape accents, trashy tambourine riding the hook. Stop-start drops and tape-stops. Tool-clink ear-candy only—no instructions. Chant hooks for yelling with a drink in hand.]
+
+[Title | SCOOTER SCIENCE (SOMETIMES)]
+
+[Chorus | chanty · mosh-bounce]  
+Scooter science—sometimes (sometimes)  
+Madman with a toolbox—sometimes  
+Whole squad like “bro, don’t do that”—sometimes  
+But it roll out clean… sometimes  
+And when it don’t? (when it don’t?)  
+He shrug, he grin, he learn that shit— that’s growth  
+Scooter science—sometimes (sometimes)  
+Sometimes it works… sometimes it’s a lesson
+
+[Verse 1 | punk-rap sprint]  
+He roll in late, helmet? nah, just vibes  
+Grease on the fingers, chaos in the eyes  
+Got it on the stand like a lab experiment  
+Talkin’ real bold like “trust me, it’s different”  
+Unplug, snap, click—then he stare at the parts  
+Like it’s Mario Kart and he min-maxin’ carts  
+“Don’t worry ’bout it”—famous last words  
+Room full of dudes watchin’ like it’s a first
+
+[Verse 2 | chaotic brag]  
+He want “faster,” not “reasonable,” not “safe”  
+He want “hold my drink while I tempt fate”  
+Neighbors peepin’ out the blinds like “what’s his problem?”  
+Chihuahua barkin’ like an OSHA rep  
+Test run: one lap, two laps, maybe three  
+Then it make a sound like “I disagree”  
+He hops off laughin’ like “okay okay… we learned somethin’”</pre>
+        </details>
+        
+        <details class="ly" >
+          <summary>
+            <span class="sum-left">
+              <span class="badge">#06</span>
+              <span class="sum-title">Chihuahua Security</span>
+            </span>
+            <span class="sum-right">west-coast bounce / comedic menace</span>
+          </summary>
+          <pre>[Sound Style | West-coast bounce: 96–104 BPM, clean punchy kick, snappy clap, warm elastic bassline. G-funk whine synth leads, bright plucks, light talkbox adlibs. Ear-candy: tiny paw taps, tag jingles, door click. Vocal playful flex, bar-story energy.]
+
+[Title | CHIHUAHUA SECURITY]
+
+[Chorus | bounce · bouncer chant]  
+Small frame, big blame — don’t cross the hallway boss  
+Tiny dog, big job — he the reason doors stay locked  
+Step too close, he pop — like “who you?” with the sauce  
+Small frame, big blame — don’t cross the hallway boss  
+He don’t need no chain, he don’t need no props  
+He checkin’ every vibe, every shoe, every thought  
+Small frame, big blame — don’t cross the hallway boss
+
+[Verse 1 | comedic menace]  
+Pulled up to the crib, thought it’s all love  
+Door crack open—then I heard that lil’ “grrr”  
+Not a pit, not a wolf, not a threat on paper  
+But he stare like “I will cancel you later”  
+He posted by the doorway like a club at ten  
+Little chest out, like “who invited them?”
+
+[Verse 2 | party story]  
+He got zones: kitchen cool, living room safe  
+But that corridor? nah, that’s a different rate  
+Some girl tried to scoop him—he said “absolutely not”  
+Then strutted off slow like a tiny CEO</pre>
+        </details>
+        
+        <details class="ly" >
+          <summary>
+            <span class="sum-left">
+              <span class="badge">#07</span>
+              <span class="sum-title">Mario Kart Court</span>
+            </span>
+            <span class="sum-right">8-bit + modern bass / game-night anthem</span>
+          </summary>
+          <pre>[Sound Style | 8-bit + modern bass: 150 BPM (or 75 halftime), punchy electronic drums, clean sub drops, chiptune leads + bitcrushed arps, sidechained pads, tasteful console SFX (countdown beeps, menu clicks). Glitch cuts between sections. Cocky playful vocal, chant hooks.]
+
+[Title | MARIO KART COURT]
+
+[Chorus | chanty · game-night bounce]  
+Friendly race… until it isn’t  
+Laughin’ loud… until you win it  
+Last lap lights, everybody in it  
+Talk that shit, then somebody get finished  
+Friendly race… until it isn’t  
+“Good game” fake… until you spin it  
+Blue shell fly, now the whole room twisted  
+Mario Kart Court—yeah, we really in session
+
+[Verse 1 | trash talk]  
+Pick my kart, pick my tires, pick my fate  
+Countdown beep, heart jump, drink in my hand  
+He bump me once—“my bad” with a grin  
+I bump him back—now the war begin
+
+[Verse 2 | rivalry]  
+Blue shell inbound, friendships start bendin’  
+He said “friendly,” then he targeted me twice  
+Now I’m standin’ up talkin’ spicy like “AIGHT.”</pre>
+        </details>
+        
+        <details class="ly" >
+          <summary>
+            <span class="sum-left">
+              <span class="badge">#08</span>
+              <span class="sum-title">Crystal Clear, Ice Cold</span>
+            </span>
+            <span class="sum-right">smooth nocturnal funk / late-night drink track</span>
+          </summary>
+          <pre>[Sound Style | Smooth nocturnal funk: 92–98 BPM, warm rubber bass, tight kick, crisp clap, brushed hats. Silky Rhodes chords, muted funk guitar, glossy synth lead. “Cold and clean” ear-candy: ice crunch, crystal glass clink, bar spoon swirl. Close confident vocal; hooks widen with harmony stacks.]
+
+[Title | CRYSTAL CLEAR, ICE COLD]
+
+[Chorus | hypnotic]  
+Crystal clear, ice cold—clink in the glass  
+Bag of that ice and it don’t ever last  
+All night, always up—yeah, we built like that  
+Cold and clean, stay sharp, never drift off track  
+Crystal clear, ice cold—lights look chrome  
+Late-night talk, smooth bass, yeah we in our zone  
+All night, always up—keep it cool, stay bold  
+Crystal clear… ice cold
+
+[Verse 1 | smooth flex]  
+Neon in the window, city hum low  
+Glass so clear you can see right through  
+Ice hit the cup—little thunder, little crack  
+Same calm grin like “yeah, we back”
+
+[Verse 2 | velvet swagger]  
+No mess, no drama, just a clean debate  
+Greyhound crack, let it fizz, let it skate  
+If your energy off, you can’t sit with the cold  
+We don’t do sloppy—we do bright and controlled</pre>
+        </details>
+        
+        <details class="ly" >
+          <summary>
+            <span class="sum-left">
+              <span class="badge">#09</span>
+              <span class="sum-title">Chalk Dust Champion</span>
+            </span>
+            <span class="sum-right">bluesy hip-hop / smoky pool hall swagger</span>
+          </summary>
+          <pre>[Sound Style | Bluesy hip-hop pool hall: 88–94 BPM, dusty swing, warm bass, blues guitar riff, subtle Rhodes. Ear-candy: chalk tap, rack clack, felt roll. Confident conversational verses; hooks widen with crowd hum and call-and-response catchphrase.]
+
+[Title | CHALK DUST CHAMPION]
+
+[Chorus | smoky swagger]  
+He don’t call bank shots—he calls outcomes  
+Chalk on the tip, then the whole room hush down  
+Line it up clean, let the cue do the talking  
+He don’t call bank shots—he calls outcomes  
+Bar talk loud till the first ball thump  
+Then it’s “ohhh” in the air when the pockets start jump  
+He don’t call bank shots—he calls outcomes  
+Like it’s already done—yeah, it’s already done
+
+[Verse 1 | bar lore]  
+Pool hall light low, jukebox tired  
+He pick up the cue like it grew from his reach  
+Angles get surgical, quiet little grin  
+Not a trick—just a habit of winnin’
+
+[Verse 2 | rivalry]  
+Put it on the table—swear he love the odds  
+He run the rack like a highlight reel, no glory  
+He don’t celebrate—he just look at your list</pre>
+        </details>
+        
+        <details class="ly" >
+          <summary>
+            <span class="sum-left">
+              <span class="badge">#10</span>
+              <span class="sum-title">State of the Bar (Wrestle Energy)</span>
+            </span>
+            <span class="sum-right">heavy halftime banger / victory lap</span>
+          </summary>
+          <pre>[Sound Style | Heavy halftime victory banger: 140 BPM halftime feel, huge kick, cracking snare, nasty 808 slides. Arena stomp-claps, crowd chants, short brass stabs, gritty guitar chugs. Spacious verses; hooks stacked with gang shouts. Hype, not sentimental—“demonstration” energy.]
+
+[Title | STATE OF THE BAR (WRESTLE ENERGY)]
+
+[Chorus | arena chant]  
+State of the bar—wrestle energy  
+He’s not braggin’—he’s demonstratin’  
+Hands up, back up—respect the chemistry  
+State of the bar—wrestle energy  
+Talk get loud, then it get real quiet  
+’Cause he don’t do threats—he just applies it  
+State of the bar—wrestle energy  
+Not a story—it’s a live exhibit
+
+[Verse 1 | victory lap]  
+He walk in smooth, no cape, no speech  
+Just that look like “I’m already in reach”  
+Bar folklore—don’t test that frame  
+He don’t talk like a champ, he just move like a name
+
+[Verse 2 | humor flex]  
+Some guy get brave after two canned drinks  
+Zay just sigh like “bro… wrong day”  
+Point ain’t pain—point is boundaries tonight  
+State of the bar, he the bouncer’s choice</pre>
+        </details>
+        
+      </div>
+    </div>
+
+    <div class="section" id="credits">
+      <h2>Credits / Data</h2>
+      <div class="card">
+        <div class="story">
+          <b>Project:</b> THE LEGEND OF ZAY — An EchoStory Birthday Album (10 Tracks)<br/>
+          <b>Delivery:</b> one self-contained HTML file (offline-friendly).<br/>
+          <b>Notes:</b> Covers are SVG (editable). Swap titles/artist text instantly without losing layout.
+          <div class="callout">
+            Want to replace any cover with a photo/AI render later? Drop a PNG/JPG into the <span class="kbd">COVERS</span> object in the JSON below and the page can render it instead of the SVG.
+          </div>
+        </div>
+        <details class="ly">
+          <summary>
+            <span class="sum-left"><span class="badge">JSON</span><span class="sum-title">Album metadata</span></span>
+            <span class="sum-right">embedded for tooling</span>
+          </summary>
+          <pre id="jsonOut"></pre>
+        </details>
+      </div>
+      <div class="footer">EchoStory file generated 2026-01-16 03:26. Built for quick sharing + future upgrades (audio embeds, real cover art, credits). 🥂</div>
+    </div>
+  </div>
+
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Cover viewer">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="left">
+          <span class="badge" id="mNum">#00</span>
+          <div style="min-width:0">
+            <div style="font-weight:800; letter-spacing:.7px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis" id="mTitle">Title</div>
+            <div style="font-size:12px; color: var(--muted);" id="mVibe">Vibe</div>
+          </div>
+        </div>
+        <button class="xbtn" id="closeBtn">Close</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-cover">
+          <div class="frame" id="mCover"></div>
+        </div>
+        <div class="modal-info">
+          <h3 id="mHeader">Track</h3>
+          <div class="kv" id="mMeta"></div>
+          <div class="quote" id="mCatch"></div>
+          <div style="margin-top:12px; font-size:12px; color: var(--muted2); line-height:1.45">
+            Tip: <span class="kbd">Esc</span> closes • Click outside to close • <span class="kbd">Tab</span> moves focus
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio Player -->
+  <div class="audio-player" id="audioPlayer" role="region" aria-label="Audio player">
+    <div class="player-progress">
+      <div class="player-progress-bar" id="progressBar"></div>
+    </div>
+    <div class="player-content">
+      <div class="player-artwork" id="playerArtwork">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+          <rect width="64" height="64" fill="#0b0f19"/>
+          <circle cx="32" cy="32" r="16" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+          <path d="M28 24l12 8-12 8z" fill="rgba(255,255,255,0.5)"/>
+        </svg>
+      </div>
+      <div class="player-info">
+        <div class="player-title" id="playerTitle">No track selected</div>
+        <div class="player-artist" id="playerArtist">THE LEGEND OF ZAY</div>
+      </div>
+      <div class="player-controls">
+        <button class="player-btn" id="prevBtn" aria-label="Previous track" title="Previous">
+          <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+        </button>
+        <button class="player-btn play-pause" id="playPauseBtn" aria-label="Play/Pause" title="Play">
+          <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="pauseIcon" viewBox="0 0 24 24" style="display:none"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>
+        </button>
+        <button class="player-btn" id="nextBtn" aria-label="Next track" title="Next">
+          <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6zm11-12v12h2V6z"/></svg>
+        </button>
+      </div>
+    </div>
+    <audio id="audioElement" preload="metadata"></audio>
+  </div>
+
+  <script type="application/json" id="albumData">{
+  "title": "THE LEGEND OF ZAY",
+  "subtitle": "An EchoStory Birthday Album (10 Tracks)",
+  "artist": "EchoVerse Presents",
+  "tagline": "No speeches. No sermons. Just evidence.",
+  "tracks": [
+    {
+      "n": 1,
+      "title": "Greyhound Season",
+      "vibe": "crunchy alt-hip-hop / bar bounce",
+      "catch": "Crack the can, no speeches—just legends in the species."
+    },
+    {
+      "n": 2,
+      "title": "Paddle Certified",
+      "vibe": "funky breakbeat / ping-pong hustler swagger",
+      "catch": "He don’t warm up—he just wins. Double down."
+    },
+    {
+      "n": 3,
+      "title": "Graveyard Next Door",
+      "vibe": "dark synthwave / neon-haunted",
+      "catch": "If the party gets quiet, the neighbors are already."
+    },
+    {
+      "n": 4,
+      "title": "The Door Nobody Talks About",
+      "vibe": "cinematic trap / mystery swagger",
+      "catch": "Bro… what is that?"
+    },
+    {
+      "n": 5,
+      "title": "Scooter Science (Sometimes)",
+      "vibe": "punk-rap / chaotic DIY energy",
+      "catch": "Sometimes it works… sometimes it’s a lesson."
+    },
+    {
+      "n": 6,
+      "title": "Chihuahua Security",
+      "vibe": "west-coast bounce / comedic menace",
+      "catch": "Small frame, big blame—don’t cross the hallway boss."
+    },
+    {
+      "n": 7,
+      "title": "Mario Kart Court",
+      "vibe": "8-bit + modern bass / game-night anthem",
+      "catch": "Friendly race… until it isn’t."
+    },
+    {
+      "n": 8,
+      "title": "Crystal Clear, Ice Cold",
+      "vibe": "smooth nocturnal funk / late-night drink track",
+      "catch": "Cold and clean. All night, always up."
+    },
+    {
+      "n": 9,
+      "title": "Chalk Dust Champion",
+      "vibe": "bluesy hip-hop / smoky pool hall swagger",
+      "catch": "He don’t call bank shots—he calls outcomes."
+    },
+    {
+      "n": 10,
+      "title": "State of the Bar (Wrestle Energy)",
+      "vibe": "heavy halftime banger / victory lap",
+      "catch": "He’s not bragging—he’s demonstrating."
+    }
+  ],
+  "interludes": [
+    {
+      "id": "A",
+      "title": "Interlude A — Paddle Ranking Dispute",
+      "text": "A friendly accusation. A quick scoreboard check. Silence. Then laughter."
+    },
+    {
+      "id": "B",
+      "title": "Interlude B — Door Report (Classified)",
+      "text": "Someone swears they heard a latch. Nobody agrees on what that means. Everybody agrees to stop asking."
+    },
+    {
+      "id": "C",
+      "title": "Interlude C — Mario Kart Tribunal",
+      "text": "A blue-shell incident becomes a case. Evidence submitted: one screenshot, three witnesses, and a dog that won’t stop barking."
+    }
+  ]
+}</script>
+  <script>
+    const $ = (s, r=document) => r.querySelector(s);
+    const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+    const data = JSON.parse($('#albumData').textContent);
+
+    // render JSON block
+    $('#jsonOut').textContent = JSON.stringify(data, null, 2);
+
+    // smooth jump
+    $$('.chip').forEach(ch => ch.addEventListener('click', () => {
+      const target = ch.getAttribute('data-jump');
+      const el = document.querySelector(target);
+      if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+    }));
+
+    // modal
+    const modal = $('#modal');
+    const close = () => modal.classList.remove('open');
+
+    function openTrack(card) {
+      const n = parseInt(card.getAttribute('data-track'), 10);
+      const title = card.getAttribute('data-title');
+      const vibe = card.getAttribute('data-vibe');
+      const catchline = card.getAttribute('data-catch');
+
+      $('#mNum').textContent = '#' + String(n).padStart(2,'0');
+      $('#mTitle').textContent = title;
+      $('#mVibe').textContent = vibe;
+      $('#mHeader').textContent = String(n).padStart(2,'0') + '. ' + title;
+      $('#mMeta').textContent = vibe;
+      $('#mCatch').textContent = '“' + catchline + '”';
+
+      // clone svg cover
+      const svg = card.querySelector('svg').outerHTML;
+      $('#mCover').innerHTML = svg;
+
+      modal.classList.add('open');
+      $('#closeBtn').focus();
+    }
+
+    $$('.track').forEach(card => {
+      card.addEventListener('click', () => openTrack(card));
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault(); openTrack(card);
+        }
+      });
+    });
+
+    $('#closeBtn').addEventListener('click', close);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) close();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') close();
+    });
+
+    // Audio Player Implementation
+    const audio = $('#audioElement');
+    const player = $('#audioPlayer');
+    const playPauseBtn = $('#playPauseBtn');
+    const prevBtn = $('#prevBtn');
+    const nextBtn = $('#nextBtn');
+    const playerTitle = $('#playerTitle');
+    const playerArtist = $('#playerArtist');
+    const playerArtwork = $('#playerArtwork');
+    const progressBar = $('#progressBar');
+    const playIcon = $('#playIcon');
+    const pauseIcon = $('#pauseIcon');
+
+    // MP3 file mapping (normalized filenames)
+    const trackFiles = {
+      1: 'greyhound_season.mp3',
+      2: 'paddle_certified.mp3',
+      3: 'graveyard_next_door.mp3',
+      4: 'the_door_nobody_talks_about.mp3',
+      5: 'scooter_science_(sometimes).mp3',
+      6: 'chihuahua_security.mp3',
+      7: 'mario_kart_court.mp3',
+      8: 'crystal_clear_ice_cold.mp3',
+      9: 'chalk_dust_champion.mp3',
+      10: 'state_of_the_bar_(wrestle_energy).mp3'
+    };
+
+    let currentTrack = null;
+    let isPlaying = false;
+
+    // Update player UI
+    function updatePlayer(trackNum) {
+      const track = data.tracks.find(t => t.n === trackNum);
+      if (!track) return;
+
+      currentTrack = trackNum;
+      const trackData = data.tracks[trackNum - 1];
+      
+      playerTitle.textContent = trackData.title;
+      playerArtist.textContent = data.artist + ' • ' + trackData.vibe;
+      
+      // Update artwork (use SVG from track card)
+      const trackCard = $(`.track[data-track="${trackNum}"]`);
+      if (trackCard) {
+        const svg = trackCard.querySelector('svg');
+        if (svg) {
+          playerArtwork.innerHTML = svg.outerHTML;
+        }
+      }
+
+      // Load audio
+      const filename = trackFiles[trackNum];
+      if (filename) {
+        audio.src = filename;
+        audio.load();
+      }
+
+      // Update track card states
+      $$('.track').forEach(card => {
+        const num = parseInt(card.getAttribute('data-track'), 10);
+        if (num === trackNum) {
+          card.classList.add('playing');
+        } else {
+          card.classList.remove('playing');
+        }
+      });
+
+      // Show player
+      player.classList.add('visible');
+
+      // Update Media Session
+      updateMediaSession(trackData);
+    }
+
+    // Media Session API for background playback
+    function updateMediaSession(trackData) {
+      if ('mediaSession' in navigator) {
+        const artwork = [];
+        // Try to get album art (prepare for future image support)
+        const trackCard = $(`.track[data-track="${currentTrack}"]`);
+        if (trackCard) {
+          const svg = trackCard.querySelector('svg');
+          if (svg) {
+            // Convert SVG to data URL for Media Session
+            const svgString = new XMLSerializer().serializeToString(svg);
+            const svgBlob = new Blob([svgString], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(svgBlob);
+            artwork.push({ src: url, sizes: '512x512', type: 'image/svg+xml' });
+          }
+        }
+
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: trackData.title,
+          artist: data.artist,
+          album: data.title,
+          artwork: artwork.length > 0 ? artwork : undefined
+        });
+
+        // Media Session actions
+        navigator.mediaSession.setActionHandler('play', () => {
+          audio.play();
+          updatePlayState(true);
+        });
+
+        navigator.mediaSession.setActionHandler('pause', () => {
+          audio.pause();
+          updatePlayState(false);
+        });
+
+        navigator.mediaSession.setActionHandler('previoustrack', () => {
+          playPrevious();
+        });
+
+        navigator.mediaSession.setActionHandler('nexttrack', () => {
+          playNext();
+        });
+
+        // Seek backward/forward (optional, for future)
+        try {
+          navigator.mediaSession.setActionHandler('seekbackward', () => {
+            audio.currentTime = Math.max(0, audio.currentTime - 10);
+          });
+          navigator.mediaSession.setActionHandler('seekforward', () => {
+            audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
+          });
+        } catch (e) {
+          // Some browsers don't support these
+        }
+      }
+    }
+
+    function updatePlayState(playing) {
+      isPlaying = playing;
+      if (playing) {
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'block';
+        playPauseBtn.setAttribute('aria-label', 'Pause');
+        playPauseBtn.setAttribute('title', 'Pause');
+      } else {
+        playIcon.style.display = 'block';
+        pauseIcon.style.display = 'none';
+        playPauseBtn.setAttribute('aria-label', 'Play');
+        playPauseBtn.setAttribute('title', 'Play');
+      }
+    }
+
+    function playTrack(trackNum) {
+      if (currentTrack !== trackNum) {
+        updatePlayer(trackNum);
+      }
+      audio.play().then(() => {
+        updatePlayState(true);
+      }).catch(err => {
+        console.error('Playback failed:', err);
+        updatePlayState(false);
+      });
+    }
+
+    function playPrevious() {
+      if (!currentTrack) return;
+      const prev = currentTrack > 1 ? currentTrack - 1 : data.tracks.length;
+      playTrack(prev);
+    }
+
+    function playNext() {
+      if (!currentTrack) return;
+      const next = currentTrack < data.tracks.length ? currentTrack + 1 : 1;
+      playTrack(next);
+    }
+
+    // Event listeners
+    playPauseBtn.addEventListener('click', () => {
+      if (!currentTrack) {
+        // Start with first track if nothing is playing
+        playTrack(1);
+        return;
+      }
+      if (isPlaying) {
+        audio.pause();
+        updatePlayState(false);
+      } else {
+        audio.play().then(() => {
+          updatePlayState(true);
+        }).catch(err => {
+          console.error('Playback failed:', err);
+        });
+      }
+    });
+
+    prevBtn.addEventListener('click', playPrevious);
+    nextBtn.addEventListener('click', playNext);
+
+    // Audio events
+    audio.addEventListener('ended', () => {
+      playNext();
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      if (audio.duration) {
+        const progress = (audio.currentTime / audio.duration) * 100;
+        progressBar.style.width = progress + '%';
+      }
+    });
+
+    audio.addEventListener('loadedmetadata', () => {
+      if ('mediaSession' in navigator && navigator.mediaSession.metadata) {
+        // Update position state for Media Session
+        if ('setPositionState' in navigator.mediaSession) {
+          navigator.mediaSession.setPositionState({
+            duration: audio.duration,
+            playbackRate: audio.playbackRate,
+            position: audio.currentTime
+          });
+        }
+      }
+    });
+
+    // Make track cards playable
+    $$('.track').forEach(card => {
+      card.addEventListener('click', (e) => {
+        const trackNum = parseInt(card.getAttribute('data-track'), 10);
+        if (!trackNum) return;
+        
+        // Play the track on click
+        playTrack(trackNum);
+      });
+    });
+
+    // Prevent page from sleeping during playback (helps with background audio)
+    let wakeLock = null;
+    async function requestWakeLock() {
+      if ('wakeLock' in navigator) {
+        try {
+          wakeLock = await navigator.wakeLock.request('screen');
+          wakeLock.addEventListener('release', () => {
+            console.log('Wake lock released');
+          });
+        } catch (err) {
+          console.log('Wake lock request failed:', err);
+        }
+      }
+    }
+
+    function releaseWakeLock() {
+      if (wakeLock) {
+        wakeLock.release();
+        wakeLock = null;
+      }
+    }
+
+    audio.addEventListener('play', () => {
+      requestWakeLock();
+    });
+
+    audio.addEventListener('pause', () => {
+      releaseWakeLock();
+    });
+
+    // Handle visibility change (when app goes to background)
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && isPlaying) {
+        // Keep playing in background (Media Session handles this)
+      }
+    });
+  </script>
+</body>
+</html>
